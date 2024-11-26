@@ -15,7 +15,7 @@ export class ProductService {
             return await this.productRepository.find();
         } catch (error) {
             console.error('Error fetching products:', error);
-            throw error;
+            return []; //Пуста)
         }
     }
 }

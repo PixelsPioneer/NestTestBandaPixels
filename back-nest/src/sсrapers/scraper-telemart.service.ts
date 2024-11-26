@@ -78,12 +78,12 @@ export class ScraperTelemartService {
         source: rawProduct.source,
       });
 
-      try {
-        const savedProduct = await this.productRepository.save(product);
+      const savedProduct = await this.productRepository.save(product);
+      if (savedProduct) {
         this.logger.log(`Saved product: ${savedProduct.title}`);
         products.push(savedProduct);
-      } catch (error) {
-        this.logger.error(`Error saving product: ${product.title}`, error);
+      } else {
+        this.logger.error(`Failed to save product: ${product.title}`);
       }
     }
 

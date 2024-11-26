@@ -6,8 +6,8 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 
 @Injectable()
-export class ScraperService {
-  private readonly logger = new Logger(ScraperService.name);
+export class ScraperRozetkaService {
+  private readonly logger = new Logger(ScraperRozetkaService.name);
 
   constructor(
     @InjectRepository(Product)
@@ -23,7 +23,7 @@ export class ScraperService {
 
       if (response.status !== 200) {
         this.logger.error(`Failed to fetch data from ${url}`);
-        throw new Error(`Failed to fetch data from ${url}`);
+        return [];
       }
 
       const $ = cheerio.load(response.data);
@@ -64,20 +64,19 @@ export class ScraperService {
       return products;
     } catch (error) {
       this.logger.error('Error during Rozetka scraping:', error);
-      throw error;
+      return [];
     }
   }
 
-    async clearProducts(): Promise<void> {
-      try {
-        this.logger.log('Clearing existing products from the database...');
-        await this.productRepository.clear();
-        this.logger.log('Successfully cleared all products from the database.');
-      } catch (error) {
-        this.logger.error('Failed to clear products from the database:', error);
-        throw error;
-      }
+  async clearProducts(): Promise<void> {
+    try {
+      this.logger.log('Clearing existing products from the database...');
+      await this.productRepository.clear();
+      this.logger.log('Successfully cleared all products from the database.');
+    } catch (error) {
+      this.logger.error('Failed to clear products from the database:', error);
     }
+  }
 
   async saveProductsToDB(products: Product[], source: string): Promise<void> {
     try {
@@ -87,7 +86,6 @@ export class ScraperService {
       }
     } catch (error) {
       this.logger.error(`Error saving products from ${source} to DB:`, error);
-      throw error;
     }
   }
 }
