@@ -1,0 +1,113 @@
+.mainCard {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+}
+
+.cardContainer {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 25px;
+    padding: 0;
+    margin: 0;
+}
+
+.card {
+    display: flex;
+    max-width: 275px;
+    width: 100%;
+    justify-content: space-between;
+    flex-direction: column;
+    border: 1px solid #282c34;
+    border-radius: 20px;
+    padding: 20px 15px;
+    gap: 20px;
+}
+
+.card:hover {
+    transform: translateY(-10px); /* Легкий підйом картки при наведенні */
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2); /* Тінь з більшою інтенсивністю */
+    border-color: #4caf50; /* Змінити колір кордону під час наведеня */
+}
+
+.productImages {
+    display: flex;
+    max-width: 201px;
+    align-self: center;
+    max-height: 205px;
+    border-radius: 20px;
+}
+
+.productTitle {
+    display: flex;
+    margin: 0;
+    max-width: 245px;
+    word-break: break-word;
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 25px;
+}
+
+.productInfoContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 5px;
+    align-items: center;
+    align-items: center;
+}
+
+.productPrice {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    color: #4caf50;
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 30px;
+}
+
+.productSource {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    font-weight: 600;
+}
+
+.productType {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    font-weight: 600;
+}
+
+.goToCardContainer {
+    display: flex;
+    justify-content: center;
+}
+
+.goToCardButton {
+    display: flex;
+    background: transparent;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    font-size: 15px;
+    font-weight: 600;
+    margin: 5px;
+    border: 1px solid #282c34;
+    border-radius: 20px;
+    padding: 15px;
+}
+
+.goToCardButton:hover {
+    background: #282c34;
+    color: #fff;
+}
+
+.addProductToCardContainer {
+    position: relative;
+}
