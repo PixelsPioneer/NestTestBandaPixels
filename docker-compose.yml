@@ -5,7 +5,7 @@ services:
     image: mysql:8.0
     container_name: db
     ports:
-      - "3307:3306"
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: newschema
@@ -27,14 +27,21 @@ services:
       - "5000:5000"
     volumes:
       - ./back-nest:/app
-    environment:
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_USER: user
-      DB_PASSWORD: rootpassword
-      DB_NAME: newschema
     depends_on:
       - db
+      - redis
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 5s
+
 
   frontend:
     build:

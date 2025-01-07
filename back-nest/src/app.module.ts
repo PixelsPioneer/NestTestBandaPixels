@@ -1,13 +1,10 @@
+import 'dotenv/config';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ScraperRozetkaService } from './sсrapers/scraper-rozetka.service';
-import { ScraperController } from './sсrapers/scrapers.controller';
-import { ScraperTelemartService } from './sсrapers/scraper-telemart.service';
-import { ProductModule } from './getAllElement/get-all-element.module';
+import { ProductModule } from './getAllElement/products.module';
 import { Product } from './models/product.enity.model';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
+import { ScraperModule } from './sсrapers/scrapers.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -22,9 +19,8 @@ dotenv.config();
       synchronize: true,
     }),
     ProductModule,
-    TypeOrmModule.forFeature([Product]),
+    ScraperModule,
+    RedisModule,
   ],
-  providers: [ScraperRozetkaService, ScraperTelemartService],
-  controllers: [ScraperController],
 })
 export class AppModule {}

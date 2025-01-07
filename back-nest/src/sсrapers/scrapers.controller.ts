@@ -1,4 +1,4 @@
-import { Controller, Get, Logger, Post } from '@nestjs/common';
+import { Controller, Get, Logger } from '@nestjs/common';
 import { ScraperTelemartService } from './scraper-telemart.service';
 import { ScraperRozetkaService } from './scraper-rozetka.service';
 import { Product } from '../models/product.enity.model';
@@ -12,24 +12,29 @@ export class ScraperController {
     private readonly rozetkaScraperService: ScraperRozetkaService,
   ) {}
 
-  @Post('scrape-telemart')
+  @Get('scrape-telemart')
   async scrapeTelemart(): Promise<Product[]> {
     this.logger.log('Starting Telemart scraping...');
     const products = await this.telemartScraperService.scrapeTelemart();
-    this.logger.log(`Successfully scraped ${products.length} products from Telemart.`);
+    this.logger.log(
+      `Successfully scraped ${products.length} products from Telemart.`,
+    );
     return products;
   }
 
-  @Post('scrape-rozetka')
+  @Get('scrape-rozetka')
   async scrapeRozetka(): Promise<Product[]> {
     this.logger.log('Starting to scrape products from Rozetka...');
 
-    await this.rozetkaScraperService.clearProducts();
+    await this.rozetkaScraperService.clearRozetkaProducts();
 
     const scrapedProducts = await this.rozetkaScraperService.scraperRozetka();
     this.logger.log(`Scraped ${scrapedProducts.length} products from Rozetka.`);
 
-    await this.rozetkaScraperService.saveProductsToDB(scrapedProducts, 'ROZETKA');
+    await this.rozetkaScraperService.saveProductsToDB(
+      scrapedProducts,
+      'ROZETKA',
+    );
 
     return scrapedProducts;
   }

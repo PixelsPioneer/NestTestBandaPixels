@@ -19,6 +19,11 @@ RUN apt-get update && apt-get install -y \
     libcups2 \
     libdrm2 \
     libxshmfence1 \
+    libatk-bridge2.0-0 \
+    libx11-xcb1 \
+    libxcb-dri3-0 \
+    libxfixes3 \
+    libxkbcommon0 \
     --no-install-recommends
 
 COPY . .
