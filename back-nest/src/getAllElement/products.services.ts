@@ -1,12 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '../models/product.enity.model';
 import { RedisService } from '../redis/redis.service';
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+import { CacheKeys } from '../redis/cache-keys.constant';
 
 @Injectable()
 export class ProductService {
@@ -17,23 +14,23 @@ export class ProductService {
   ) {}
 
   async getAllProducts(): Promise<Product[]> {
-    const cachedProducts =
-      await this.redisService.get<Product[]>('all_products');
+    const cachedProducts = await this.redisService.get<Product[]>(
+      CacheKeys.PRODUCTS,
+    );
     if (cachedProducts) {
-      console.log('Returning products from cache');
+      Logger.log('Returning products from cache');
       return cachedProducts;
     }
 
-    await sleep(1);
     const products = await this.productRepository.find();
 
     if (!products) {
       throw new BadRequestException('No products found');
     }
 
-    await this.redisService.set('all_products', products, 60);
+    await this.redisService.set(CacheKeys.PRODUCTS, products, 60);
 
-    console.log('Returning products from database');
+    Logger.log('Returning products from database');
     return products;
   }
 }

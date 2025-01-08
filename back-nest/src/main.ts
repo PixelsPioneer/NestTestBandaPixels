@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
@@ -19,7 +20,7 @@ async function bootstrap() {
 
   const PORT = process.env.PORT;
   await app.listen(PORT);
-  console.log(`Server is running on http://localhost:${PORT}`);
+  Logger.log(`Server is running on http://localhost:${PORT}`);
 }
 
 bootstrap();
