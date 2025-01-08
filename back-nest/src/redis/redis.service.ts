@@ -43,8 +43,8 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   async delete(): Promise<void> {
-    await this.redisClient.flushall();
-    Logger.log('All cache in Redis has been cleared');
+    await this.redisClient.flushdb();
+    this.logger.log('Cache in current Redis has been cleared');
   }
 
   async onModuleDestroy() {

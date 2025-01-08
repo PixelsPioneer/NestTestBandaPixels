@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '../models/product.enity.model';
@@ -27,7 +27,7 @@ export class ProductService {
     const products = await this.productRepository.find();
 
     if (!products) {
-      throw new BadRequestException('No products found');
+      return [];
     }
 
     await this.redisService.set(CacheKeys.PRODUCTS, products, 60);
