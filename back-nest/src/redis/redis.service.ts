@@ -32,9 +32,9 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
         'EX',
         expirationInSeconds,
       );
-    } else {
-      await this.redisClient.set(key, serializedValue);
+      return;
     }
+    await this.redisClient.set(key, serializedValue);
   }
 
   async get<T>(key: string): Promise<T | null> {
