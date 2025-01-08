@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import puppeteer from 'puppeteer';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RedisService } from '../redis/redis.service';
 import { Product } from '../models/product.enity.model';
 
 @Injectable()
@@ -11,6 +12,7 @@ export class ScraperTelemartService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    private readonly redisService: RedisService,
   ) {}
 
   async scrapeTelemart(): Promise<Product[]> {
@@ -113,6 +115,7 @@ export class ScraperTelemartService {
       });
 
       const savedProduct = await this.productRepository.save(product);
+
       if (savedProduct) {
         this.logger.log(`Saved product: ${savedProduct.title}`);
         products.push(savedProduct);
@@ -120,6 +123,9 @@ export class ScraperTelemartService {
         this.logger.error(`Failed to save product: ${product.title}`);
       }
     }
+
+    await this.redisService.delete();
+    this.logger.log('Redis cache cleared after saving products to DB.');
 
     await browser.close();
     return products;
