@@ -4,6 +4,7 @@ import Redis from 'ioredis';
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(RedisService.name);
   private redisClient: Redis;
 
   async onModuleInit() {
@@ -12,8 +13,10 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       port: parseInt(process.env.REDIS_PORT, 1) || 6379,
     });
 
-    this.redisClient.on('connect', () => Logger.log('Connected to Redis'));
-    this.redisClient.on('error', (err) => Logger.error('Redis error:', err));
+    this.redisClient.on('connect', () => this.logger.log('Connected to Redis'));
+    this.redisClient.on('error', (err) =>
+      this.logger.error('Redis error:', err),
+    );
   }
 
   async set(

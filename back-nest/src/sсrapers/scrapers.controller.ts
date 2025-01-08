@@ -26,8 +26,6 @@ export class ScraperController {
   async scrapeRozetka(): Promise<Product[]> {
     this.logger.log('Starting to scrape products from Rozetka...');
 
-    await this.rozetkaScraperService.clearRozetkaProducts();
-
     const scrapedProducts = await this.rozetkaScraperService.scraperRozetka();
     this.logger.log(`Scraped ${scrapedProducts.length} products from Rozetka.`);
 

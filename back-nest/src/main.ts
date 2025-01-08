@@ -4,7 +4,8 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const logger = new Logger('Bootstrap');
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
   app.enableCors({
     origin: process.env.CORS_ORIGIN,
@@ -20,7 +21,7 @@ async function bootstrap() {
 
   const PORT = process.env.PORT;
   await app.listen(PORT);
-  Logger.log(`Server is running on http://localhost:${PORT}`);
+  logger.log(`Server is running on http://localhost:${PORT}`);
 }
 
 bootstrap();

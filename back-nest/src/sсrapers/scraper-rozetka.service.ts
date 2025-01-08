@@ -91,14 +91,14 @@ export class ScraperRozetkaService {
   }
 
   async saveProductsToDB(products: Product[], source: string): Promise<void> {
-    if (products.length > 0) {
-      await this.productRepository.save(products);
-      this.logger.log(
-        `Saved ${products.length} products from ${source} to DB.`,
-      );
-
-      await this.redisService.delete();
-      this.logger.log('Redis cache cleared after saving products to DB.');
+    if (!products.length) {
+      return;
     }
+
+    await this.productRepository.save(products);
+    this.logger.log(`Saved ${products.length} products from ${source} to DB.`);
+
+    await this.redisService.delete();
+    this.logger.log('Redis cache cleared after saving products to DB.');
   }
 }

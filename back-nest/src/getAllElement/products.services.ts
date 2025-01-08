@@ -7,6 +7,8 @@ import { CacheKeys } from '../redis/cache-keys.constant';
 
 @Injectable()
 export class ProductService {
+  private readonly logger = new Logger(ProductService.name);
+
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
@@ -18,7 +20,7 @@ export class ProductService {
       CacheKeys.PRODUCTS,
     );
     if (cachedProducts) {
-      Logger.log('Returning products from cache');
+      this.logger.log('Returning products from cache');
       return cachedProducts;
     }
 
@@ -30,7 +32,7 @@ export class ProductService {
 
     await this.redisService.set(CacheKeys.PRODUCTS, products, 60);
 
-    Logger.log('Returning products from database');
+    this.logger.log('Returning products from database');
     return products;
   }
 }
