@@ -2,6 +2,7 @@ import { Controller, Get, Logger } from '@nestjs/common';
 import { ScraperTelemartService } from './scraper-telemart.service';
 import { ScraperRozetkaService } from './scraper-rozetka.service';
 import { Product } from '../models/product.enity.model';
+import { ResponseDto } from '../dto/response.dto';
 
 @Controller('scraper')
 export class ScraperController {
@@ -23,7 +24,7 @@ export class ScraperController {
   }
 
   @Get('scrape-rozetka')
-  async scrapeRozetka(): Promise<{ message: string; totalProducts: number }> {
+  async scrapeRozetka(): Promise<ResponseDto> {
     this.logger.log('Starting to scrape products from Rozetka...');
 
     const scrapedProducts = await this.rozetkaScraperService.scraperRozetka();

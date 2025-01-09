@@ -88,13 +88,13 @@ export class ScraperRozetkaService {
         where: { title: product.title, source: product.source },
       });
 
-      if (existingProduct) {
-        await this.productRepository.update(existingProduct.id, product);
-        this.logger.log(`Updated product with title: ${product.title}`);
-      } else {
+      if (!existingProduct) {
         await this.productRepository.save(product);
         this.logger.log(`Created new product with title: ${product.title}`);
+        return;
       }
+      await this.productRepository.update(existingProduct.id, product);
+      this.logger.log(`Updated product with title: ${product.title}`);
     });
 
     await Promise.all(operations);
