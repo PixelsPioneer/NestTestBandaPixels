@@ -23,17 +23,30 @@ export class ScraperController {
   }
 
   @Get('scrape-rozetka')
-  async scrapeRozetka(): Promise<Product[]> {
+  async scrapeRozetka(): Promise<{ message: string; totalProducts: number }> {
     this.logger.log('Starting to scrape products from Rozetka...');
 
     const scrapedProducts = await this.rozetkaScraperService.scraperRozetka();
+
+    if (!scrapedProducts || scrapedProducts.length === 0) {
+      this.logger.warn('No products were scraped from Rozetka.');
+      return {
+        message: 'No products were scraped from Rozetka.',
+        totalProducts: 0,
+      };
+    }
+
     this.logger.log(`Scraped ${scrapedProducts.length} products from Rozetka.`);
 
-    await this.rozetkaScraperService.saveProductsToDB(
-      scrapedProducts,
-      'ROZETKA',
+    await this.rozetkaScraperService.saveProductsToDB(scrapedProducts);
+
+    this.logger.log(
+      `Scraping and update and insert completed successfully. Total products processed: ${scrapedProducts.length}`,
     );
 
-    return scrapedProducts;
+    return {
+      message: 'Scraping and update and insert completed successfully.',
+      totalProducts: scrapedProducts.length,
+    };
   }
 }

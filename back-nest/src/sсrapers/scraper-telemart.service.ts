@@ -103,24 +103,37 @@ export class ScraperTelemartService {
     const products: Product[] = [];
 
     for (const rawProduct of rawProducts) {
-      const product = this.productRepository.create({
-        title: rawProduct.title,
-        subtitle: rawProduct.subtitle,
-        description: rawProduct.description,
-        newPrice: rawProduct.price,
-        specifications: rawProduct.specifications,
-        type: rawProduct.type,
-        profileImage: rawProduct.profileImage,
-        source: rawProduct.source,
+      const existingProduct = await this.productRepository.findOne({
+        where: { title: rawProduct.title, source: rawProduct.source },
       });
 
-      const savedProduct = await this.productRepository.save(product);
-
-      if (savedProduct) {
-        this.logger.log(`Saved product: ${savedProduct.title}`);
-        products.push(savedProduct);
+      if (existingProduct) {
+        this.productRepository.merge(existingProduct, {
+          subtitle: rawProduct.subtitle,
+          description: rawProduct.description,
+          newPrice: rawProduct.price,
+          specifications: rawProduct.specifications,
+          type: rawProduct.type,
+          profileImage: rawProduct.profileImage,
+        });
+        const updatedProduct =
+          await this.productRepository.save(existingProduct);
+        this.logger.log(`Updated product: ${updatedProduct.title}`);
+        products.push(updatedProduct);
       } else {
-        this.logger.error(`Failed to save product: ${product.title}`);
+        const newProduct = this.productRepository.create({
+          title: rawProduct.title,
+          subtitle: rawProduct.subtitle,
+          description: rawProduct.description,
+          newPrice: rawProduct.price,
+          specifications: rawProduct.specifications,
+          type: rawProduct.type,
+          profileImage: rawProduct.profileImage,
+          source: rawProduct.source,
+        });
+        const savedProduct = await this.productRepository.save(newProduct);
+        this.logger.log(`Created new product: ${savedProduct.title}`);
+        products.push(savedProduct);
       }
     }
 
