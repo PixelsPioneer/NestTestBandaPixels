@@ -1,6 +1,6 @@
 import { IsString, IsNumber } from 'class-validator';
 
-export class ResponseDto {
+export class ScrapeRozetkaResponseDto {
   @IsString()
   message: string;
 
