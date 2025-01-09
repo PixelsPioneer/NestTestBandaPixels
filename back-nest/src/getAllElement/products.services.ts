@@ -1,0 +1,38 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Product } from '../models/product.enity.model';
+import { RedisService } from '../redis/redis.service';
+import { CacheKeys } from '../redis/cache-keys.constant';
+
+@Injectable()
+export class ProductService {
+  private readonly logger = new Logger(ProductService.name);
+
+  constructor(
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
+    private readonly redisService: RedisService,
+  ) {}
+
+  async getAllProducts(): Promise<Product[]> {
+    const cachedProducts = await this.redisService.get<Product[]>(
+      CacheKeys.PRODUCTS,
+    );
+    if (cachedProducts) {
+      this.logger.log('Returning products from cache');
+      return cachedProducts;
+    }
+
+    const products = await this.productRepository.find();
+
+    if (!products) {
+      return [];
+    }
+
+    await this.redisService.set(CacheKeys.PRODUCTS, products, 60);
+
+    this.logger.log('Returning products from database');
+    return products;
+  }
+}
