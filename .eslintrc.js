@@ -18,7 +18,6 @@ module.exports = {
         semi: ['error', 'always'],
         'no-unused-vars': ['error', { vars: 'local' }],
         'no-plusplus': 'off',
-        'no-cond-assign': ['error', 'always'],
-        eqeqeq: ['warn', 'smart']
+        'no-cond-assign': ['error', 'always']
     }
 };

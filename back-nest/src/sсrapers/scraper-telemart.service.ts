@@ -1,21 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
 import puppeteer from 'puppeteer';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import { product } from '@prisma/client';
+import { PrismaService } from '../../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
-import { Product } from '../models/product.enity.model';
 
 @Injectable()
 export class ScraperTelemartService {
   private readonly logger = new Logger(ScraperTelemartService.name);
 
   constructor(
-    @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>,
+    private readonly prisma: PrismaService, // Using PrismaService
     private readonly redisService: RedisService,
   ) {}
 
-  async scrapeTelemart(): Promise<Product[]> {
+  async scrapeTelemart(): Promise<product[]> {
     const url = 'https://telemart.ua/ua/pc/';
     const browser = await puppeteer.launch({
       args: ['--no-sandbox'],
@@ -99,42 +97,50 @@ export class ScraperTelemartService {
       `Found ${rawProducts.length} products. Saving to database...`,
     );
 
-    const products: Product[] = [];
+    const products: product[] = [];
 
-    for (const rawProduct of rawProducts) {
-      const existingProduct = await this.productRepository.findOne({
-        where: { title: rawProduct.title, source: rawProduct.source },
-      });
+    for (const product of rawProducts) {
+      const {
+        title,
+        subtitle,
+        description,
+        source,
+        specifications,
+        type,
+        profileImage,
+        price,
+      } = product;
 
-      if (!existingProduct) {
-        const newProduct = this.productRepository.create({
-          title: rawProduct.title,
-          subtitle: rawProduct.subtitle,
-          description: rawProduct.description,
-          newPrice: rawProduct.price,
-          specifications: rawProduct.specifications,
-          type: rawProduct.type,
-          profileImage: rawProduct.profileImage,
-          source: rawProduct.source,
+      try {
+        const productData = {
+          title,
+          subtitle,
+          description,
+          newPrice: price,
+          specifications,
+          type,
+          profileImage,
+          source,
+        };
+
+        const product = await this.prisma.product.upsert({
+          where: {
+            title_source: {
+              title,
+              source,
+            },
+          },
+          update: productData,
+          create: productData,
         });
-        const savedProduct = await this.productRepository.save(newProduct);
-        this.logger.log(`Created new product: ${savedProduct.title}`);
-        products.push(savedProduct);
-        return;
+
+        if (product) {
+          this.logger.log(`Processed product: ${product.title}`);
+          products.push(product);
+        }
+      } catch (error) {
+        this.logger.error('Error processing product', error);
       }
-
-      this.productRepository.merge(existingProduct, {
-        subtitle: rawProduct.subtitle,
-        description: rawProduct.description,
-        newPrice: rawProduct.price,
-        specifications: rawProduct.specifications,
-        type: rawProduct.type,
-        profileImage: rawProduct.profileImage,
-      });
-
-      const updatedProduct = await this.productRepository.save(existingProduct);
-      this.logger.log(`Updated product: ${updatedProduct.title}`);
-      products.push(updatedProduct);
     }
 
     await this.redisService.delete();

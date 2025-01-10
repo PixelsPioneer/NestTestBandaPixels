@@ -1,24 +1,13 @@
 import 'dotenv/config';
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductModule } from './getAllElement/products.module';
-import { Product } from './models/product.enity.model';
 import { ScraperModule } from './sсrapers/scrapers.module';
 import { RedisModule } from './redis/redis.module';
 import { LoggerModule } from 'nestjs-pino';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT, 1) || 3306,
-      username: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      entities: [Product],
-      synchronize: true,
-    }),
     LoggerModule.forRoot({
       pinoHttp: {
         level: 'info',
@@ -48,5 +37,6 @@ import { LoggerModule } from 'nestjs-pino';
     ScraperModule,
     RedisModule,
   ],
+  providers: [PrismaService], // Додано PrismaService до провайдерів
 })
 export class AppModule {}
