@@ -1,11 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Index } from 'typeorm';
 
 @Entity()
+@Index(['title'], { unique: true })
 export class Product {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 256 })
+  @Column({ length: 256, unique: true })
   title: string;
 
   @Column({ length: 256, nullable: true })

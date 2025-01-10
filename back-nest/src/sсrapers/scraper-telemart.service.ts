@@ -66,11 +66,10 @@ export class ScraperTelemartService {
                 .querySelector('.product-short-char__item__label')
                 ?.textContent?.trim() || 'Unknown';
 
-            const value =
+            specifications[label] =
               specElement
                 .querySelector('.product-short-char__item__value')
                 ?.textContent?.trim() || 'Unknown';
-            specifications[label] = value;
           });
 
         const type = element.getAttribute('data-prod-type') || 'Unknown type';
@@ -103,25 +102,39 @@ export class ScraperTelemartService {
     const products: Product[] = [];
 
     for (const rawProduct of rawProducts) {
-      const product = this.productRepository.create({
-        title: rawProduct.title,
+      const existingProduct = await this.productRepository.findOne({
+        where: { title: rawProduct.title, source: rawProduct.source },
+      });
+
+      if (!existingProduct) {
+        const newProduct = this.productRepository.create({
+          title: rawProduct.title,
+          subtitle: rawProduct.subtitle,
+          description: rawProduct.description,
+          newPrice: rawProduct.price,
+          specifications: rawProduct.specifications,
+          type: rawProduct.type,
+          profileImage: rawProduct.profileImage,
+          source: rawProduct.source,
+        });
+        const savedProduct = await this.productRepository.save(newProduct);
+        this.logger.log(`Created new product: ${savedProduct.title}`);
+        products.push(savedProduct);
+        return;
+      }
+
+      this.productRepository.merge(existingProduct, {
         subtitle: rawProduct.subtitle,
         description: rawProduct.description,
         newPrice: rawProduct.price,
         specifications: rawProduct.specifications,
         type: rawProduct.type,
         profileImage: rawProduct.profileImage,
-        source: rawProduct.source,
       });
 
-      const savedProduct = await this.productRepository.save(product);
-
-      if (savedProduct) {
-        this.logger.log(`Saved product: ${savedProduct.title}`);
-        products.push(savedProduct);
-      } else {
-        this.logger.error(`Failed to save product: ${product.title}`);
-      }
+      const updatedProduct = await this.productRepository.save(existingProduct);
+      this.logger.log(`Updated product: ${updatedProduct.title}`);
+      products.push(updatedProduct);
     }
 
     await this.redisService.delete();

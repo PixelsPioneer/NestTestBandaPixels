@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../models/product.enity.model';
-import { RedisService } from '../redis/redis.service';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
@@ -13,7 +12,6 @@ export class ScraperRozetkaService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
-    private readonly redisService: RedisService,
   ) {}
 
   async scraperRozetka(): Promise<Product[]> {
@@ -77,28 +75,28 @@ export class ScraperRozetkaService {
     }
   }
 
-  async clearRozetkaProducts(): Promise<void> {
-    try {
-      this.logger.log('Deleting products with source "ROZETKA"');
-      await this.productRepository.delete({ source: 'ROZETKA' });
-      this.logger.log('Successfully deleted products with source "ROZETKA"');
-    } catch (error) {
-      this.logger.error(
-        'Failed to delete products with source "ROZETKA"',
-        error,
-      );
-    }
-  }
-
-  async saveProductsToDB(products: Product[], source: string): Promise<void> {
-    if (!products.length) {
+  async saveProductsToDB(products: Product[]): Promise<void> {
+    if (!products?.length) {
+      this.logger.log('No products to save.');
       return;
     }
 
-    await this.productRepository.save(products);
-    this.logger.log(`Saved ${products.length} products from ${source} to DB.`);
+    const operations = products.map(async (product) => {
+      const existingProduct = await this.productRepository.findOne({
+        where: { title: product.title, source: product.source },
+      });
 
-    await this.redisService.delete();
-    this.logger.log('Redis cache cleared after saving products to DB.');
+      if (!existingProduct) {
+        await this.productRepository.save(product);
+        this.logger.log(`Created new product with title: ${product.title}`);
+        return;
+      }
+      await this.productRepository.update(existingProduct.id, product);
+      this.logger.log(`Updated product with title: ${product.title}`);
+    });
+
+    await Promise.all(operations);
+
+    this.logger.log(`Successfully processed ${products.length} products.`);
   }
 }
