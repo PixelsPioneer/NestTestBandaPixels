@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../models/product.enity.model';
-import { RedisService } from '../redis/redis.service';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
@@ -13,7 +12,6 @@ export class ScraperRozetkaService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
-    private readonly redisService: RedisService,
   ) {}
 
   async scraperRozetka(): Promise<Product[]> {
@@ -78,7 +76,7 @@ export class ScraperRozetkaService {
   }
 
   async saveProductsToDB(products: Product[]): Promise<void> {
-    if (!products || products.length === 0) {
+    if (!products?.length) {
       this.logger.log('No products to save.');
       return;
     }
