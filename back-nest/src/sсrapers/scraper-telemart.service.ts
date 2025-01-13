@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import puppeteer from 'puppeteer';
 import { product } from '@prisma/client';
+
 import { PrismaService } from '../../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 
@@ -97,21 +98,19 @@ export class ScraperTelemartService {
       `Found ${rawProducts.length} products. Saving to database...`,
     );
 
-    const products: product[] = [];
+    const products = await Promise.all(
+      rawProducts.map(async (rawProduct) => {
+        const {
+          title,
+          subtitle,
+          description,
+          source,
+          specifications,
+          type,
+          profileImage,
+          price,
+        } = rawProduct;
 
-    for (const product of rawProducts) {
-      const {
-        title,
-        subtitle,
-        description,
-        source,
-        specifications,
-        type,
-        profileImage,
-        price,
-      } = product;
-
-      try {
         const productData = {
           title,
           subtitle,
@@ -123,25 +122,23 @@ export class ScraperTelemartService {
           source,
         };
 
-        const product = await this.prisma.product.upsert({
-          where: {
-            title_source: {
-              title,
-              source,
+        return this.prisma.product
+          .upsert({
+            where: {
+              title_source: {
+                title,
+                source,
+              },
             },
-          },
-          update: productData,
-          create: productData,
-        });
-
-        if (product) {
-          this.logger.log(`Processed product: ${product.title}`);
-          products.push(product);
-        }
-      } catch (error) {
-        this.logger.error('Error processing product', error);
-      }
-    }
+            update: productData,
+            create: productData,
+          })
+          .then((product) => {
+            this.logger.log(`Processed product: ${product.title}`);
+            return product;
+          });
+      }),
+    );
 
     await this.redisService.delete();
     this.logger.log('Redis cache cleared after saving products to DB.');

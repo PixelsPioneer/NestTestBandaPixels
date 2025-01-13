@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
 import { product as ProductType } from '@prisma/client';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class ScraperRozetkaService {

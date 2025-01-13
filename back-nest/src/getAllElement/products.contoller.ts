@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
-import { ProductService } from './products.services';
 import { product } from '@prisma/client';
+
+import { ProductService } from './products.services';
 
 @Controller('product')
 export class ProductController {

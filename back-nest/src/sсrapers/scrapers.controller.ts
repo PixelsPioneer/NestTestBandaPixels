@@ -1,8 +1,9 @@
 import { Controller, Get, Logger } from '@nestjs/common';
+import { product as ProductType } from '@prisma/client';
+
 import { ScraperTelemartService } from './scraper-telemart.service';
 import { ScraperRozetkaService } from './scraper-rozetka.service';
 import { PrismaService } from '../../prisma/prisma.service';
-import { product as ProductType } from '@prisma/client';
 import { ScrapeRozetkaResponseDto } from '../dto/scrapeRozetkaResponse.dto';
 
 @Controller('scraper')
@@ -29,7 +30,6 @@ export class ScraperController {
       `Scraped ${scrapedProducts.length} products from Telemart.`,
     );
 
-    // Збереження продуктів у базу даних через Prisma
     const savedProducts = await Promise.all(
       scrapedProducts.map(async (product) => {
         const existingProduct = await this.prisma.product.findUnique({

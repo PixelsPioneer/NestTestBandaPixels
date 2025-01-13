@@ -1,9 +1,10 @@
 import 'dotenv/config';
 import { Module } from '@nestjs/common';
+import { LoggerModule } from 'nestjs-pino';
+
 import { ProductModule } from './getAllElement/products.module';
 import { ScraperModule } from './sсrapers/scrapers.module';
 import { RedisModule } from './redis/redis.module';
-import { LoggerModule } from 'nestjs-pino';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
@@ -37,6 +38,6 @@ import { PrismaService } from '../prisma/prisma.service';
     ScraperModule,
     RedisModule,
   ],
-  providers: [PrismaService], // Додано PrismaService до провайдерів
+  providers: [PrismaService],
 })
 export class AppModule {}
