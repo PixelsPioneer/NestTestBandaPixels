@@ -1,13 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
+import { product } from '@prisma/client';
+
 import { ProductService } from './products.services';
-import { Product } from '../models/product.enity.model';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
-  async getAllProducts(): Promise<Product[]> {
+  async getAllProducts(): Promise<product[]> {
     return this.productService.getAllProducts();
   }
 }

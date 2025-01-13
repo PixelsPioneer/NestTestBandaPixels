@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Product } from '../models/product.enity.model';
+import { product } from '@prisma/client';
+
+import { PrismaService } from '../../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { CacheKeys } from '../redis/cache-keys.constant';
 
@@ -10,13 +10,12 @@ export class ProductService {
   private readonly logger = new Logger(ProductService.name);
 
   constructor(
-    @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>,
+    private readonly prisma: PrismaService,
     private readonly redisService: RedisService,
   ) {}
 
-  async getAllProducts(): Promise<Product[]> {
-    const cachedProducts = await this.redisService.get<Product[]>(
+  async getAllProducts(): Promise<product[]> {
+    const cachedProducts = await this.redisService.get<product[]>(
       CacheKeys.PRODUCTS,
     );
     if (cachedProducts) {
@@ -24,9 +23,9 @@ export class ProductService {
       return cachedProducts;
     }
 
-    const products = await this.productRepository.find();
+    const products = await this.prisma.product.findMany();
 
-    if (!products) {
+    if (!products?.length) {
       return [];
     }
 

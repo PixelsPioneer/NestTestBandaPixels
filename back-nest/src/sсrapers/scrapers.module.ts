@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { ScraperTelemartService } from './scraper-telemart.service';
 import { ScraperController } from './scrapers.controller';
 import { ScraperRozetkaService } from './scraper-rozetka.service';
-import { Product } from '../models/product.enity.model';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product])],
   controllers: [ScraperController],
-  providers: [ScraperTelemartService, ScraperRozetkaService],
+  providers: [ScraperTelemartService, ScraperRozetkaService, PrismaService],
 })
 export class ScraperModule {}
