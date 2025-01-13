@@ -5,7 +5,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { ProductModule } from './getAllElement/products.module';
 import { ScraperModule } from './sсrapers/scrapers.module';
 import { RedisModule } from './redis/redis.module';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [
@@ -37,7 +37,8 @@ import { PrismaService } from '../prisma/prisma.service';
     ProductModule,
     ScraperModule,
     RedisModule,
+    PrismaModule,
   ],
-  providers: [PrismaService],
+  providers: [],
 })
 export class AppModule {}
