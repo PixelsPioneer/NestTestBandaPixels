@@ -1,9 +1,9 @@
 import { Controller, Get, HttpCode, Logger } from '@nestjs/common';
-import { product as ProductType } from '@prisma/client';
 
 import { ProductService } from '../products/products.services';
 import { ScraperTelemartService } from './scraper-telemart.service';
 import { ScraperRozetkaService } from './scraper-rozetka.service';
+import { Sources } from './models/sources';
 
 @Controller('scraper')
 export class ScraperController {
@@ -33,14 +33,15 @@ export class ScraperController {
     await this.productService.upsertProducts(scrapedProducts);
 
     this.logger.log(
-      `Successfully processed ${scrapedProducts.length} products from Telemart.`,
+      `Successfully processed ${scrapedProducts.length} products from ${Sources.Telemart}.`,
     );
 
     return;
   }
 
+  @HttpCode(204)
   @Get('scrape-rozetka')
-  async scrapeRozetka(): Promise<ProductType[]> {
+  async scrapeRozetka(): Promise<void> {
     this.logger.log('Starting to scrape products from Rozetka...');
 
     const scrapedProducts =
@@ -48,7 +49,7 @@ export class ScraperController {
 
     if (!scrapedProducts || scrapedProducts.length === 0) {
       this.logger.warn('No products were scraped from Rozetka.');
-      return [];
+      return;
     }
 
     this.logger.log(`Scraped ${scrapedProducts.length} products from Rozetka.`);
@@ -56,7 +57,7 @@ export class ScraperController {
     await this.productService.upsertProducts(scrapedProducts);
 
     this.logger.log(
-      `Successfully processed ${scrapedProducts.length} products from Rozetka.`,
+      `Successfully processed ${scrapedProducts.length} products from ${Sources.Rozetka}`,
     );
 
     return;

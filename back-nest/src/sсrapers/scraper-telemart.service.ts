@@ -52,25 +52,23 @@ export class ScraperTelemartService {
 
         const price = Number(element.getAttribute('data-price')) || 0;
 
-        const specifications: string = JSON.stringify(
-          Array.from(
-            element.querySelectorAll('.product-short-char__item'),
-          ).reduce(
-            (acc, specElement) => {
-              const label =
-                specElement
-                  .querySelector('.product-short-char__item__label')
-                  ?.textContent?.trim() || 'Unknown';
+        const specifications: Record<string, string> = {};
 
-              acc[label] =
-                specElement
-                  .querySelector('.product-short-char__item__value')
-                  ?.textContent?.trim() || 'Unknown';
-              return acc;
-            },
-            {} as Record<string, string>,
-          ),
-        );
+        Array.from(
+          element.querySelectorAll('.product-short-char__item'),
+        ).forEach((specElement) => {
+          const label =
+            specElement
+              .querySelector('.product-short-char__item__label')
+              ?.textContent?.trim() || 'Unknown';
+
+          const value =
+            specElement
+              .querySelector('.product-short-char__item__value')
+              ?.textContent?.trim() || 'Unknown';
+
+          specifications[label] = value;
+        });
 
         const type = element.getAttribute('data-prod-type') || 'Unknown type';
 
@@ -87,7 +85,7 @@ export class ScraperTelemartService {
           subtitle,
           description,
           price,
-          specifications,
+          specifications: JSON.stringify(specifications),
           type,
           profileImage,
           newPrice: price,
