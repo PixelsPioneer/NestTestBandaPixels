@@ -1,19 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { product as ProductType } from '@prisma/client';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
-import { PrismaService } from '../../prisma/prisma.service';
+import { Sources } from './models/sources';
+import { ScrapedProduct } from './models/scraped-product.model';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class ScraperRozetkaService {
   private readonly logger = new Logger(ScraperRozetkaService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly redisService: RedisService) {}
 
-  async scraperRozetka(): Promise<Omit<ProductType, 'id'>[]> {
+  async scrapeRozetkaProducts(): Promise<ScrapedProduct[]> {
     const url = 'https://rozetka.com.ua/ua/computers-notebooks/c80095/';
     this.logger.log(`Starting scraping Rozetka URL: ${url}`);
+    const products: ScrapedProduct[] = [];
 
     const response = await axios.get(url);
     if (response.status !== 200) {
@@ -22,7 +24,6 @@ export class ScraperRozetkaService {
     }
 
     const $ = cheerio.load(response.data);
-    const products: Omit<ProductType, 'id'>[] = [];
 
     $('.goods-tile').each((index, element) => {
       const title = $(element).find('.goods-tile__title').text().trim();
@@ -30,7 +31,7 @@ export class ScraperRozetkaService {
       const description =
         $(element).find('.goods-tile__description').text().trim() ||
         'No description available';
-      const newPrice = parseFloat(
+      const price = parseFloat(
         $(element)
           .find('.goods-tile__price-value')
           .text()
@@ -44,49 +45,29 @@ export class ScraperRozetkaService {
       const profileImage =
         $(element).find('.goods-tile__picture img').attr('src') ||
         $(element).find('.goods-tile__picture img').attr('data-src');
-      const source = 'ROZETKA';
 
-      if (title && newPrice && profileImage) {
-        const productData: Omit<ProductType, 'id'> = {
+      if (title && price && profileImage) {
+        const productData: ScrapedProduct = {
           title,
           subtitle,
           description,
-          newPrice,
+          price,
           specifications,
           type,
           profileImage,
-          source,
+          newPrice: null,
+          source: Sources.Rozetka,
         };
 
         products.push(productData);
       }
     });
 
+    await this.redisService.delete();
+    this.logger.log('Redis cache cleared after saving products to DB.');
+
     this.logger.log(`Scraped ${products.length} products from Rozetka.`);
+
     return products;
-  }
-
-  async saveProductsToDB(products: Omit<ProductType, 'id'>[]): Promise<void> {
-    if (!products?.length) {
-      this.logger.log('No products to save.');
-      return;
-    }
-
-    const operations = products.map(async (product) => {
-      this.prisma.product.upsert({
-        where: {
-          title_source: {
-            title: product.title,
-            source: product.source,
-          },
-        },
-        create: product,
-        update: product,
-      });
-    });
-
-    await Promise.all(operations);
-
-    this.logger.log(`Successfully processed ${products.length} products.`);
   }
 }

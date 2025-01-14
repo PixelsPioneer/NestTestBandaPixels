@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { Module } from '@nestjs/common';
 import { LoggerModule } from 'nestjs-pino';
 
-import { ProductModule } from './getAllElement/products.module';
+import { ProductModule } from './products/products.module';
 import { ScraperModule } from './sсrapers/scrapers.module';
 import { RedisModule } from './redis/redis.module';
 import { PrismaModule } from '../prisma/prisma.module';

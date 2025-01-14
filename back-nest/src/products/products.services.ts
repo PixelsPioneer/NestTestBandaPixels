@@ -4,6 +4,7 @@ import { product } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { CacheKeys } from '../redis/cache-keys.constant';
+import { ScrapedProduct } from '../sсrapers/models/scraped-product.model';
 
 @Injectable()
 export class ProductService {
@@ -33,5 +34,32 @@ export class ProductService {
 
     this.logger.log('Returning products from database');
     return products;
+  }
+
+  async upsertProducts(products: ScrapedProduct[]): Promise<void> {
+    await Promise.all(
+      products.map((productData) => {
+        const { title, source, newPrice, price, ...rest } = productData;
+
+        const productToUpdate = {
+          ...rest,
+          title,
+          source,
+        };
+
+        this.logger.log(`Upserting product: ${title} from source: ${source}`);
+
+        return this.prisma.product.upsert({
+          where: {
+            title_source: {
+              title,
+              source,
+            },
+          },
+          update: { ...productToUpdate, newPrice: newPrice || price },
+          create: { ...productToUpdate, newPrice: newPrice || price },
+        });
+      }),
+    );
   }
 }

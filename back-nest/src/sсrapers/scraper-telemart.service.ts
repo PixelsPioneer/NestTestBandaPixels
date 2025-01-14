@@ -1,27 +1,24 @@
 import { Injectable, Logger } from '@nestjs/common';
 import puppeteer from 'puppeteer';
-import { product } from '@prisma/client';
 
-import { PrismaService } from '../../prisma/prisma.service';
+import { Sources } from './models/sources';
 import { RedisService } from '../redis/redis.service';
+import { ScrapedProduct } from './models/scraped-product.model';
 
 @Injectable()
 export class ScraperTelemartService {
   private readonly logger = new Logger(ScraperTelemartService.name);
 
-  constructor(
-    private readonly prisma: PrismaService, // Using PrismaService
-    private readonly redisService: RedisService,
-  ) {}
+  constructor(private readonly redisService: RedisService) {}
 
-  async scrapeTelemart(): Promise<product[]> {
+  async scrapeTelemart(): Promise<ScrapedProduct[]> {
     const url = 'https://telemart.ua/ua/pc/';
     const browser = await puppeteer.launch({
       args: ['--no-sandbox'],
       headless: true,
     });
-    const page = await browser.newPage();
 
+    const page = await browser.newPage();
     await page.setUserAgent(
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
     );
@@ -32,12 +29,12 @@ export class ScraperTelemartService {
     await page.waitForSelector('.product-item__inner', { timeout: 30000 });
 
     this.logger.log('Extracting product data...');
-    const rawProducts = await page.evaluate(() => {
+    const rawProducts: ScrapedProduct[] = await page.evaluate((source) => {
       const items = Array.from(
         document.querySelectorAll('.product-item__inner'),
       );
 
-      return items.map((element) => {
+      return items.map<ScrapedProduct>((element) => {
         const title =
           element
             .querySelector('.product-item__title a')
@@ -55,21 +52,23 @@ export class ScraperTelemartService {
 
         const price = Number(element.getAttribute('data-price')) || 0;
 
-        const specifications: { [key: string]: string } = {};
+        const specifications: Record<string, string> = {};
 
-        element
-          .querySelectorAll('.product-short-char__item')
-          .forEach((specElement) => {
-            const label =
-              specElement
-                .querySelector('.product-short-char__item__label')
-                ?.textContent?.trim() || 'Unknown';
+        Array.from(
+          element.querySelectorAll('.product-short-char__item'),
+        ).forEach((specElement) => {
+          const label =
+            specElement
+              .querySelector('.product-short-char__item__label')
+              ?.textContent?.trim() || 'Unknown';
 
-            specifications[label] =
-              specElement
-                .querySelector('.product-short-char__item__value')
-                ?.textContent?.trim() || 'Unknown';
-          });
+          const value =
+            specElement
+              .querySelector('.product-short-char__item__value')
+              ?.textContent?.trim() || 'Unknown';
+
+          specifications[label] = value;
+        });
 
         const type = element.getAttribute('data-prod-type') || 'Unknown type';
 
@@ -89,61 +88,21 @@ export class ScraperTelemartService {
           specifications: JSON.stringify(specifications),
           type,
           profileImage,
-          source: 'TELEMART',
+          newPrice: price,
+          source,
         };
       });
-    });
+    }, Sources.Telemart);
 
     this.logger.log(
       `Found ${rawProducts.length} products. Saving to database...`,
-    );
-
-    const products = await Promise.all(
-      rawProducts.map(async (rawProduct) => {
-        const {
-          title,
-          subtitle,
-          description,
-          source,
-          specifications,
-          type,
-          profileImage,
-          price,
-        } = rawProduct;
-
-        const productData = {
-          title,
-          subtitle,
-          description,
-          newPrice: price,
-          specifications,
-          type,
-          profileImage,
-          source,
-        };
-
-        return this.prisma.product
-          .upsert({
-            where: {
-              title_source: {
-                title,
-                source,
-              },
-            },
-            update: productData,
-            create: productData,
-          })
-          .then((product) => {
-            this.logger.log(`Processed product: ${product.title}`);
-            return product;
-          });
-      }),
     );
 
     await this.redisService.delete();
     this.logger.log('Redis cache cleared after saving products to DB.');
 
     await browser.close();
-    return products;
+
+    return rawProducts;
   }
 }
