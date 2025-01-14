@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
+import { Sources } from './models/sources';
 import { ScrapedProduct } from './models/scraped-product.model';
 import { RedisService } from '../redis/redis.service';
 
@@ -44,7 +45,6 @@ export class ScraperRozetkaService {
       const profileImage =
         $(element).find('.goods-tile__picture img').attr('src') ||
         $(element).find('.goods-tile__picture img').attr('data-src');
-      const source = 'ROZETKA';
 
       if (title && price && profileImage) {
         const productData: ScrapedProduct = {
@@ -55,7 +55,8 @@ export class ScraperRozetkaService {
           specifications,
           type,
           profileImage,
-          source,
+          newPrice: null,
+          source: Sources.Rozetka,
         };
 
         products.push(productData);

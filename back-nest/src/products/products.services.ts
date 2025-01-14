@@ -39,13 +39,15 @@ export class ProductService {
   async upsertProducts(products: ScrapedProduct[]): Promise<void> {
     await Promise.all(
       products.map((productData) => {
-        const { title, source } = productData;
+        const { title, source, newPrice, price, ...rest } = productData;
 
-        delete productData.newPrice;
-        const { price, newPrice, ...productToUpdate } = productData;
+        const productToUpdate = {
+          ...rest,
+          title,
+          source,
+        };
 
         this.logger.log(`Upserting product: ${title} from source: ${source}`);
-        this.logger.log(productData);
 
         return this.prisma.product.upsert({
           where: {

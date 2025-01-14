@@ -1,7 +1,7 @@
 import { Controller, Get, HttpCode, Logger } from '@nestjs/common';
 import { product as ProductType } from '@prisma/client';
 
-import { ProductService } from '../getAllElement/products.services';
+import { ProductService } from '../products/products.services';
 import { ScraperTelemartService } from './scraper-telemart.service';
 import { ScraperRozetkaService } from './scraper-rozetka.service';
 
