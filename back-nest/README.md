@@ -66,6 +66,49 @@ Build and start the container:
  docker-compose up --build
 ```
 
+## **Prisma Migrations**
+
+If u want create new migration in Prisma:
+
+Firstly u must change database host in DATABASE_URL .env file
+
+```bash
+ DATABASE_URL= "mysql://root:rootpassword@db:3306/newschema"  
+```
+
+TO
+
+```bash
+ DATABASE_URL= "mysql://root:rootpassword@localhost:3306/newschema"
+```
+
+and start only db container in docker
+
+after u can  change module in  schema.prisma and make migrations
+
+If u change module in schema prisma u must write this comand
+
+```bash
+ npx prisma migrate dev --name your_name_prisma_migration
+```
+And press "y" button for make migration
+
+After this complitet  u must write this comand for generate Prisma Client
+
+```bash
+   npm run prigen
+```
+
+Atention!!!
+
+dont forget add migration to git if u see what she doesn`t added
+
+And change u DATABASE_URL back
+
+```bash
+ DATABASE_URL= "mysql://root:rootpassword@db:3306/newschema"
+```
+
 ## **Common Commands**
 
 Start in development mode:

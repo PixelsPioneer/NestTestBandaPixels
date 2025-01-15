@@ -21,21 +21,25 @@ export const Card: FC<CardProps> = ({ element }) => {
                 className={styles.productImages}
                 src={element.profileImage}
                 alt={element.title || 'No title available'}
+                onClick={handleButtonClick}
             />
             <p className={styles.productTitle}>{element.title}</p>
             <div className={styles.productInfoContainer}>
-                <p className={styles.productPrice}>{element.newPrice}₴</p>
+                {element.hasDiscount ? (
+                    <div>
+                        <p className={styles.oldPrice}>{element.price}₴</p>
+                        <p className={styles.productPrice}>
+                            {element.newPrice}₴
+                        </p>
+                    </div>
+                ) : (
+                    <p className={styles.productPrice}>{element.price}₴</p>
+                )}
                 <p className={styles.productSource}>Source: {element.source}</p>
                 <p className={styles.productType}>{element.type}</p>
-                <div className={styles.goToCardContainer}>
-                    <button
-                        className={styles.goToCardButton}
-                        onClick={handleButtonClick}
-                    >
-                        Go to Product Page
-                    </button>
-                </div>
+
             </div>
+
         </li>
     );
 };

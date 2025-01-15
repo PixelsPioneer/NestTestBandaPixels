@@ -8,4 +8,5 @@ export interface ScrapedProduct {
   profileImage: string | null;
   source: string;
   newPrice: number | null;
+  hasDiscount: boolean;
 }

@@ -14,6 +14,7 @@ export class ScraperRozetkaService {
 
   async scrapeRozetkaProducts(): Promise<ScrapedProduct[]> {
     const url = 'https://rozetka.com.ua/ua/computers-notebooks/c80095/';
+
     this.logger.log(`Starting scraping Rozetka URL: ${url}`);
     const products: ScrapedProduct[] = [];
 
@@ -31,31 +32,45 @@ export class ScraperRozetkaService {
       const description =
         $(element).find('.goods-tile__description').text().trim() ||
         'No description available';
-      const price = parseFloat(
+
+      const oldPrice: string | null =
         $(element)
-          .find('.goods-tile__price-value')
+          .find('.goods-tile__price--old')
           .text()
           .replace(/\s/g, '')
-          .trim(),
-      );
+          .trim() || null;
+
+      const currentPrice = $(element)
+        .find('.goods-tile__price-value')
+        .text()
+        .replace(/\s/g, '')
+        .trim();
+
+      const price = oldPrice ? parseFloat(oldPrice) : parseFloat(currentPrice);
+
+      const hasDiscount = !!oldPrice;
+
       const specifications =
         $(element).find('.goods-tile__specifications').text().trim() ||
         'No specifications available';
       const type = 'Computer';
+
       const profileImage =
         $(element).find('.goods-tile__picture img').attr('src') ||
-        $(element).find('.goods-tile__picture img').attr('data-src');
+        $(element).find('.ng-star-inserted img').attr('src') ||
+        null;
 
-      if (title && price && profileImage) {
+      if (title && profileImage && price) {
         const productData: ScrapedProduct = {
           title,
           subtitle,
           description,
           price,
+          newPrice: hasDiscount ? parseFloat(currentPrice) : null,
           specifications,
           type,
           profileImage,
-          newPrice: null,
+          hasDiscount,
           source: Sources.Rozetka,
         };
 
