@@ -50,8 +50,6 @@ export class ScraperTelemartService {
             .querySelector('.product-card__description')
             ?.textContent?.trim() || 'No description available';
 
-        const price = Number(element.getAttribute('data-price')) || 0;
-
         const specifications: Record<string, string> = {};
 
         Array.from(
@@ -72,23 +70,51 @@ export class ScraperTelemartService {
 
         const type = element.getAttribute('data-prod-type') || 'Unknown type';
 
-        const imageElement = element.querySelector(
-          '.swiper-slide.swiper-slide-active img',
+        const profileImage =
+          element
+            .querySelector('.swiper-slide.swiper-slide-active img')
+            ?.getAttribute('src') || 'No image available';
+
+        const footerColumn = element.querySelector(
+          '.product-item__footer-column',
         );
 
-        const profileImage = imageElement
-          ? imageElement.getAttribute('src')
+        const currentPrice =
+          footerColumn?.querySelector('.product-cost')?.textContent?.trim() ||
+          '0';
+
+        const oldPrice =
+          footerColumn
+            ?.querySelector('.product-cost_old')
+            ?.textContent?.trim() || null;
+
+        const newPrice =
+          footerColumn
+            ?.querySelector('.product-cost_new')
+            ?.textContent?.trim() || null;
+
+        const parsedCurrentPrice =
+          parseFloat(currentPrice.replace(/[^\d.-]/g, '')) || 0;
+        const parsedOldPrice = oldPrice
+          ? parseFloat(oldPrice.replace(/[^\d.-]/g, ''))
           : null;
+        const parsedNewPrice = newPrice
+          ? parseFloat(newPrice.replace(/[^\d.-]/g, ''))
+          : null;
+
+        const price = parsedOldPrice || parsedCurrentPrice;
+        const hasDiscount = !!parsedOldPrice;
 
         return {
           title,
           subtitle,
           description,
           price,
+          newPrice: hasDiscount ? parsedNewPrice : null,
           specifications: JSON.stringify(specifications),
           type,
           profileImage,
-          newPrice: price,
+          hasDiscount,
           source,
         };
       });

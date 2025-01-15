@@ -39,11 +39,13 @@ export class ProductService {
   async upsertProducts(products: ScrapedProduct[]): Promise<void> {
     await Promise.all(
       products.map((productData) => {
-        const { title, source, newPrice, price, ...rest } = productData;
+        const { title, source, price, newPrice, ...rest } = productData;
 
         const productToUpdate = {
           ...rest,
           title,
+          price,
+          newPrice,
           source,
         };
 
@@ -56,8 +58,8 @@ export class ProductService {
               source,
             },
           },
-          update: { ...productToUpdate, newPrice: newPrice || price },
-          create: { ...productToUpdate, newPrice: newPrice || price },
+          update: { ...productToUpdate },
+          create: { ...productToUpdate },
         });
       }),
     );

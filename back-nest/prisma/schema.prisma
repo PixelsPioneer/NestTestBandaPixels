@@ -12,11 +12,13 @@ model product {
   title          String  @unique @db.VarChar(256)
   subtitle       String? @db.VarChar(256)
   description    String  @default("No description available") @db.VarChar(2048)
-  newPrice       Float
+  price          Float
+  newPrice       Float?
   specifications String  @default("No specifications available") @db.VarChar(2048)
   type           String  @db.VarChar(128)
-  profileImage   String? @db.VarChar(1024)
+  profileImage   String? @db.Text
   source         String  @db.VarChar(255)
+  hasDiscount    Boolean @default(false)
 
   @@unique([title, source])
 }

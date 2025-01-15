@@ -3,10 +3,12 @@ export interface Element {
     title: string | null;
     subtitle: string | null;
     description: string | null;
-    newPrice: number;
+    price: number;
+    newPrice: number | null;
     profileImage: string;
     link: string;
     source: string;
     specification: string;
     type: string;
+    hasDiscount: boolean;
 }
