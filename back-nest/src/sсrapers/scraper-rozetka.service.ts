@@ -33,7 +33,6 @@ export class ScraperRozetkaService {
         $(element).find('.goods-tile__description').text().trim() ||
         'No description available';
 
-      // Original price if discount present. Could be nullable
       const oldPrice: string | null =
         $(element)
           .find('.goods-tile__price--old')
@@ -41,7 +40,6 @@ export class ScraperRozetkaService {
           .replace(/\s/g, '')
           .trim() || null;
 
-      // Could be original price if no discount present or price with discount
       const currentPrice = $(element)
         .find('.goods-tile__price-value')
         .text()

@@ -82,7 +82,7 @@ TO
  DATABASE_URL= "mysql://root:rootpassword@localhost:3306/newschema"
 ```
 
-and start only db conteiner in docker
+and start only db container in docker
 
 after u can  change module in  schema.prisma and make migrations
 
@@ -93,7 +93,7 @@ If u change module in schema prisma u must write this comand
 ```
 And press "y" button for make migration
 
-After this compltet  u must write this comand for generate Prisma Client
+After this complitet  u must write this comand for generate Prisma Client
 
 ```bash
    npm run prigen
