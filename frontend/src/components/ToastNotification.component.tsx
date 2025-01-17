@@ -16,6 +16,6 @@ const createNotification = (type: "success" | "error" | "warning", message: stri
   toast[type](message, baseOptions);
 };
 
-export const showSuccessNotification = (message: string) => createNotification("success", message);
-export const showErrorNotification = (message: string) => createNotification("error", message);
-export const showWarningNotification = (message: string) => createNotification("warning", message);
+export const toastSuccess = (message: string) => createNotification("success", message);
+export const toastError = (message: string) => createNotification("error", message);
+export const toastWarning = (message: string) => createNotification("warning", message);

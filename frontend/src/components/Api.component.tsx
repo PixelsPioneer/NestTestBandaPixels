@@ -3,7 +3,7 @@ import axios from 'axios';
 import type { Element } from '../interfaces/Element.component';
 import { Card } from './Card.component';
 import styles from './product-list.module.css';
-import { showErrorNotification, showSuccessNotification, showWarningNotification } from './ToastNotification.component';
+import { toastError, toastSuccess, toastWarning } from './ToastNotification.component';
 
 export const Api: React.FC = () => {
     const [elements, setElements] = useState<Element[]>([]);
@@ -15,12 +15,12 @@ export const Api: React.FC = () => {
                   `${process.env.REACT_APP_API_BASE_URL}/product`
                 );
                 if (!response || !response.data) {
-                    showErrorNotification('No data received.');
+                    toastError('No data received.');
                     return;
                 }
                 setElements(response.data);
             } catch (error) {
-                showErrorNotification('Error fetching data.');
+                toastError('Error fetching data.');
                 return;
             }
         };
@@ -30,7 +30,7 @@ export const Api: React.FC = () => {
 
     const handleDelete = (id: number) => {
         setElements((prevElements) => prevElements.filter((element) => element.id !== id));
-        showSuccessNotification('Product deleted successfully !');
+        toastSuccess('Product deleted successfully !');
     };
 
 

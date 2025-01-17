@@ -6,34 +6,32 @@ import { Api } from './components/Api.component';
 import { Header } from './components/Header.component';
 
 function App() {
-  const [isDarkTheme, setIsDarkTheme] = useState(() => {
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const savedTheme = localStorage.getItem('theme');
-    return savedTheme === 'dark';
+    return savedTheme === 'dark' ? 'dark' : 'light';
   });
 
-  const setTheme = (theme: 'light' | 'dark') => {
-    setIsDarkTheme(theme === 'dark');
-    localStorage.setItem('theme', theme);
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
   };
 
-  const toggleComponent = (componentName: string) => {};
-
   useEffect(() => {
-    if (isDarkTheme) {
+    if (theme === 'dark') {
       document.body.classList.add('dark-theme');
       document.body.classList.remove('light-theme');
     } else {
       document.body.classList.add('light-theme');
       document.body.classList.remove('dark-theme');
     }
-  }, [isDarkTheme]);
+  }, [theme]);
 
   return (
     <div className="App">
       <Header
-        toggleComponent={toggleComponent}
-        setTheme={setTheme}
-        isDarkTheme={isDarkTheme}
+        toggleTheme={toggleTheme}
+        isDarkTheme={theme === 'dark'}
       />
       <Api />
       <ToastContainer />

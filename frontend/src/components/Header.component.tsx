@@ -2,19 +2,11 @@ import React, { useEffect } from 'react';
 import styles from './header.module.css';
 
 interface HeaderProps {
-  toggleComponent: (componentName: string) => void;
-  setTheme: (theme: 'light' | 'dark') => void;
+  toggleTheme: () => void;
   isDarkTheme: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = ({ toggleComponent, isDarkTheme, setTheme }) => {
-
-  const toggleTheme = () => {
-    const newTheme = isDarkTheme ? 'light' : 'dark';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-  };
-
+export const Header: React.FC<HeaderProps> = ({ toggleTheme, isDarkTheme }) => {
   useEffect(() => {
     if (isDarkTheme) {
       document.body.classList.add(styles['dark-theme']);
