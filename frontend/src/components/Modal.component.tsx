@@ -23,7 +23,9 @@ export const Modal: FC<ModalProps> = ({ isVisible, onClose, onConfirm, title, ch
     };
   }, [isVisible]);
 
-  if (!isVisible) return null;
+  if (!isVisible) {
+    return <></>;
+  }
 
   const handleBackgroundClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
