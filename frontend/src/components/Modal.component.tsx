@@ -1,5 +1,6 @@
 import { FC, ReactNode, useEffect } from 'react';
 import styles from './modal.module.css';
+import { ModalFooterButtons } from './ModalFooterButtons.component';
 
 interface ModalProps {
   isVisible: boolean;
@@ -36,18 +37,7 @@ export const Modal: FC<ModalProps> = ({ isVisible, onClose, onConfirm, title, ch
         {title && <h2 className={styles.modalTitle}>{title}</h2>}
         <div className={styles.modalBody}>{children}</div>
         <div className={styles.modalFooter}>
-          <button
-            className={`${styles.modalButton} ${styles.modalButtonConfirm}`}
-            onClick={onConfirm}
-          >
-            Yes
-          </button>
-          <button
-            className={`${styles.modalButton} ${styles.modalButtonClose}`}
-            onClick={onClose}
-          >
-            No
-          </button>
+          <ModalFooterButtons onConfirm={onConfirm || onClose} onClose={onClose} />
         </div>
       </div>
     </div>

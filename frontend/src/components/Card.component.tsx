@@ -3,6 +3,7 @@ import { Element } from '../interfaces/Element.component';
 import { Modal } from './Modal.component';
 import axios from 'axios';
 import styles from './product-list.module.css';
+import { showErrorNotification } from './ToastNotification.component';
 
 export interface CardProps {
   element: Element;
@@ -16,17 +17,24 @@ export const Card: FC<CardProps> = ({ element, onDelete }) => {
     if (element.subtitle) {
       window.open(element.subtitle, '_blank');
     } else {
-      console.error("No subtitle link available");
+      showErrorNotification("No subtitle link available");
     }
   };
 
   const handleDelete = async () => {
     setModalVisible(false);
     try {
-      await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/product/${element.id}`);
+      const response = await axios.delete(
+        `${process.env.REACT_APP_API_BASE_URL}/product/${element.id}`
+      );
+      if (!response || response.status !== 200) {
+        showErrorNotification('Failed to delete product. Please try again.');
+        return;
+      }
       onDelete();
     } catch (error) {
-      console.error('Error deleting product', error);
+      showErrorNotification('Error deleting product');
+      return;
     }
   };
 

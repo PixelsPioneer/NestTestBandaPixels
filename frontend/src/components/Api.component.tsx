@@ -3,7 +3,7 @@ import axios from 'axios';
 import type { Element } from '../interfaces/Element.component';
 import { Card } from './Card.component';
 import styles from './product-list.module.css';
-import { showSuccessNotification } from './ToastNotification.component';
+import { showErrorNotification, showSuccessNotification, showWarningNotification } from './ToastNotification.component';
 
 export const Api: React.FC = () => {
     const [elements, setElements] = useState<Element[]>([]);
@@ -14,19 +14,25 @@ export const Api: React.FC = () => {
                 const response = await axios.get(
                   `${process.env.REACT_APP_API_BASE_URL}/product`
                 );
+                if (!response || !response.data) {
+                    showErrorNotification('No data received.');
+                    return;
+                }
                 setElements(response.data);
             } catch (error) {
-                console.error('Error fetching data:', error);
+                showErrorNotification('Error fetching data.');
+                return;
             }
         };
-
         fetchData();
     }, []);
+
 
     const handleDelete = (id: number) => {
         setElements((prevElements) => prevElements.filter((element) => element.id !== id));
         showSuccessNotification('Product deleted successfully !');
     };
+
 
     return (
       <div>
