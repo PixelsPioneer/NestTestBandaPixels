@@ -1,0 +1,60 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap");
+
+body {
+    display: flex;
+    background-color: var(--background-color);
+    flex-direction: column;
+    align-content: center;
+    font-family: "Montserrat", sans-serif;
+    min-width: 390px;
+}
+
+.App {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+:root{
+    --white:  #FFF;
+    --black: #000000;
+    --dark-grey: #232222;
+    --grey: #CCC;
+    --shadow: #0000007F;
+    --white-shadow: #FFFFFFBD;
+    --confirm-color: #268e12;
+    --confirm-color-hover: #126007;
+    --cancel-color: #e41d1d;
+    --cancel-color-hover: #c50d0d;
+    --discount-price: #F84147;
+    --selected-card: #4caf50;
+    --card-shadow: #00000033;
+    --card-borders: #282c34;
+}
+
+.dark-theme {
+    --background-color: var(--dark-grey);
+    --text-color: var(--white);
+    --text-color-price: var(--white);
+    --modal-window-background-color: var(--black);
+    --header-background-color: var(--black);
+    --card-shadow: var(--white);
+    --card-border: var(--grey);
+    --close-button: var(--white);
+    --close-button-hover: var(--cancel-color);
+    --close-button-background-hover: var(--white);
+    --close-button-border: var(--white);
+}
+
+.light-theme {
+    --background-color: var(--white);
+    --text-color: var(--black);
+    --text-color-price: var(--black);
+    --modal-window-background-color: var(--white);
+    --header-background-color: var(--grey);
+    --card-shadow: var(--shadow);
+    --card-border: var(--card-borders);
+    --close-button: var(--black);
+    --close-button-hover: var(--cancel-color);
+    --close-button-background-hover: var(--white);
+    --close-button-border: var(--black);
+}

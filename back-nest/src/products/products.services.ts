@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { product } from '@prisma/client';
 
 import { PrismaService } from '../../prisma/prisma.service';
@@ -63,5 +63,24 @@ export class ProductService {
         });
       }),
     );
+  }
+
+  async deleteProduct(id: number): Promise<any> {
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+    });
+
+    if (!product) {
+      throw new NotFoundException(`Product with id ${id} not found`);
+    }
+
+    await this.prisma.product.delete({
+      where: { id },
+    });
+    this.logger.log('Product has been deleted');
+
+    await this.redisService.delete();
+
+    return product;
   }
 }

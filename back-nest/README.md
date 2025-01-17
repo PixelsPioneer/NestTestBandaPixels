@@ -96,7 +96,7 @@ And press "y" button for make migration
 After this complitet  u must write this comand for generate Prisma Client
 
 ```bash
-   npm run prigen
+   npm run prsigen
 ```
 
 Atention!!!

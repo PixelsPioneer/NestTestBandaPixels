@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import axios from 'axios';
+import puppeteer from 'puppeteer';
 import * as cheerio from 'cheerio';
 
 import { Sources } from './models/sources';
@@ -14,17 +14,68 @@ export class ScraperRozetkaService {
 
   async scrapeRozetkaProducts(): Promise<ScrapedProduct[]> {
     const url = 'https://rozetka.com.ua/ua/computers-notebooks/c80095/';
-
     this.logger.log(`Starting scraping Rozetka URL: ${url}`);
+
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--disable-web-security', '--no-sandbox'],
+    });
+
+    const page = await browser.newPage();
+
+    await page.setUserAgent(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+    );
+
+    await page.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, 'webdriver', { get: () => false });
+    });
+
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+
+    this.logger.log(`Navigating to ${url}...`);
+    await page.goto(url, { waitUntil: 'load', timeout: 60000 });
+
+    await page.evaluate(async () => {
+      let scrollHeight = document.body.scrollHeight;
+      let scrolledHeight = 0;
+      const distance = 100;
+
+      while (scrolledHeight < scrollHeight) {
+        window.scrollBy(0, distance);
+        scrolledHeight += distance;
+
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        const newScrollHeight = document.body.scrollHeight;
+
+        if (newScrollHeight > scrollHeight) {
+          scrollHeight = newScrollHeight;
+        }
+      }
+    });
+
+    await page.waitForSelector('.goods-tile', { timeout: 30000 });
+    await page.waitForSelector('.goods-tile__picture', { timeout: 30000 });
+    await page.waitForSelector('img[loading="lazy"], img[src]', {
+      timeout: 60000,
+    });
+
+    await page.evaluate(() => {
+      const images = document.querySelectorAll('img[loading="lazy"]');
+      images.forEach((img) => {
+        if (img instanceof HTMLImageElement) {
+          if (img.dataset.src) {
+            img.src = img.dataset.src;
+          }
+        }
+      });
+    });
+
+    const htmlContent = await page.content();
+    const $ = cheerio.load(htmlContent);
+
     const products: ScrapedProduct[] = [];
-
-    const response = await axios.get(url);
-    if (response.status !== 200) {
-      this.logger.error(`Failed to fetch data from ${url}`);
-      return [];
-    }
-
-    const $ = cheerio.load(response.data);
 
     $('.goods-tile').each((index, element) => {
       const title = $(element).find('.goods-tile__title').text().trim();
@@ -55,10 +106,9 @@ export class ScraperRozetkaService {
         'No specifications available';
       const type = 'Computer';
 
-      const profileImage =
-        $(element).find('.goods-tile__picture img').attr('src') ||
-        $(element).find('.ng-star-inserted img').attr('src') ||
-        null;
+      const profileImage = $(element)
+        .find('.goods-tile__picture img')
+        .attr('src');
 
       if (title && profileImage && price) {
         const productData: ScrapedProduct = {
@@ -82,6 +132,8 @@ export class ScraperRozetkaService {
     this.logger.log('Redis cache cleared after saving products to DB.');
 
     this.logger.log(`Scraped ${products.length} products from Rozetka.`);
+
+    await browser.close();
 
     return products;
   }
