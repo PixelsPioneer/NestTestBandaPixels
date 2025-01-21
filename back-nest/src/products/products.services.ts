@@ -66,10 +66,6 @@ export class ProductService {
   }
 
   async deleteProduct(id: number): Promise<void> {
-    await this.prisma.product.findUnique({
-      where: { id },
-    });
-
     await this.prisma.product.delete({
       where: { id },
     });
