@@ -1,34 +1,37 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './header.module.css';
+import { Themes } from '../constants/constants';
 
 interface HeaderProps {
   toggleTheme: () => void;
-  isDarkTheme: boolean;
+  theme: Themes;
 }
 
-export const Header: React.FC<HeaderProps> = ({ toggleTheme, isDarkTheme }) => {
+export const Header: React.FC<HeaderProps> = ({ toggleTheme, theme }) => {
+  const [currentTheme, setCurrentTheme] = useState<Themes>(theme);
+
   useEffect(() => {
-    if (isDarkTheme) {
-      document.body.classList.add(styles['dark-theme']);
-      document.body.classList.remove(styles['light-theme']);
-    } else {
-      document.body.classList.add(styles['light-theme']);
-      document.body.classList.remove(styles['dark-theme']);
-    }
-  }, [isDarkTheme]);
+    setCurrentTheme(theme);
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    toggleTheme();
+  };
 
   return (
     <header className={styles.header}>
       <div className={styles.logo}>My App</div>
-      <div className={styles['theme-toggle-container']} onClick={toggleTheme}>
+      <div className={styles['theme-toggle-container']} onClick={handleToggleTheme}>
         <div
-          className={`${styles['theme-toggle']} ${isDarkTheme ? styles.dark : styles.light}`}
+          className={`${styles['theme-toggle']} ${currentTheme === Themes.DARK ? styles.dark : styles.light}`}
         >
-          <span className={styles.label}>light</span>
-          <span className={styles.label}>dark</span>
+          <span className={styles.label}>{Themes.LIGHT}</span>
+          <span className={styles.label}>{Themes.DARK}</span>
           <div className={styles.slider}></div>
         </div>
       </div>
     </header>
   );
 };
+
+export default Header;

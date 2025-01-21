@@ -12,15 +12,7 @@ interface ModalProps {
 
 export const Modal: FC<ModalProps> = ({ isVisible, onClose, onConfirm, title, children }) => {
   useEffect(() => {
-    if (isVisible) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
-
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
+    document.body.style.overflow = isVisible ? 'hidden' : 'auto';
   }, [isVisible]);
 
   if (!isVisible) {

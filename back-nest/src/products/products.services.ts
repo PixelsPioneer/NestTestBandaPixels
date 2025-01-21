@@ -65,7 +65,7 @@ export class ProductService {
     );
   }
 
-  async deleteProduct(id: number): Promise<any> {
+  async deleteProduct(id: number): Promise<void> {
     const product = await this.prisma.product.findUnique({
       where: { id },
     });
@@ -79,8 +79,6 @@ export class ProductService {
     });
     this.logger.log('Product has been deleted');
 
-    await this.redisService.delete();
-
-    return product;
+    await this.redisService.deleteProductCache();
   }
 }

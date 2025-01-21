@@ -4,6 +4,7 @@ import { Modal } from './Modal.component';
 import axios from 'axios';
 import styles from './product-list.module.css';
 import { toastError} from './ToastNotification.component';
+import { apiEndpoints} from '../constants/constants';
 
 export interface CardProps {
   element: Element;
@@ -21,22 +22,23 @@ export const Card: FC<CardProps> = ({ element, onDelete }) => {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (id: number) => {
     setModalVisible(false);
+
     try {
-      const response = await axios.delete(
-        `${process.env.REACT_APP_API_BASE_URL}/product/${element.id}`
-      );
+      const response = await axios.delete(apiEndpoints.productDelete(id.toString()));
+
       if (!response || response.status !== 200) {
         toastError('Failed to delete product. Please try again.');
         return;
       }
       onDelete();
+
     } catch (error) {
       toastError('Error deleting product');
-      return;
     }
   };
+
 
   return (
     <>
@@ -59,14 +61,8 @@ export const Card: FC<CardProps> = ({ element, onDelete }) => {
         <p className={styles.productTitle}>{element.title}</p>
         <div className={styles.productInfoContainer}>
           <div className={styles.priceContainer}>
-            {element.hasDiscount ? (
-              <>
-                <p className={styles.oldPrice}>{element.price}₴</p>
-                <p className={styles.productPrice}>{element.newPrice}₴</p>
-              </>
-            ) : (
-              <p className={styles.productPrice}>{element.price}₴</p>
-            )}
+            {element.hasDiscount && <p className={styles.oldPrice}>{element.price}₴</p>}
+            <p className={styles.productPrice}> {element.hasDiscount ? element.newPrice : element.price}₴ </p>
           </div>
           <p className={styles.productSource}>Source: {element.source}</p>
           <p className={styles.productType}>{element.type}</p>
@@ -77,8 +73,8 @@ export const Card: FC<CardProps> = ({ element, onDelete }) => {
       <Modal
         isVisible={isModalVisible}
         onClose={() => setModalVisible(false)}
-        onConfirm={handleDelete}
-        title="Are you sure want to delete this product?"
+        onConfirm={() => handleDelete(element.id)}
+        title="Are you sure you want to delete this product?"
       >
       </Modal>
     </>

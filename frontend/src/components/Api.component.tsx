@@ -4,6 +4,7 @@ import type { Element } from '../interfaces/Element.component';
 import { Card } from './Card.component';
 import styles from './product-list.module.css';
 import { toastError, toastSuccess, toastWarning } from './ToastNotification.component';
+import { apiEndpoints} from '../constants/constants';
 
 export const Api: React.FC = () => {
     const [elements, setElements] = useState<Element[]>([]);
@@ -11,9 +12,7 @@ export const Api: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(
-                  `${process.env.REACT_APP_API_BASE_URL}/product`
-                );
+                const response = await axios.get( apiEndpoints.products);
                 if (!response || !response.data) {
                     toastError('No data received.');
                     return;
