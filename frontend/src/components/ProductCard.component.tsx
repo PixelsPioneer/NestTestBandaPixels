@@ -11,7 +11,7 @@ export interface CardProps {
   onDelete: () => void;
 }
 
-export const Card: FC<CardProps> = ({ element, onDelete }) => {
+export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
   const [isModalVisible, setModalVisible] = useState(false);
 
   const handleButtonClick = () => {

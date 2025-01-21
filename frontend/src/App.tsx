@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Api } from './components/Products.component';
+import { ProductsComponent } from './components/Products.component';
 import { Header } from './components/Header.component';
 import { useTheme } from './hooks/useTheme'
 
@@ -12,7 +12,7 @@ function App() {
   return (
     <div className="App">
       <Header toggleTheme={toggleTheme} theme={theme} />
-      <Api />
+      <ProductsComponent />
       <ToastContainer />
     </div>
   );

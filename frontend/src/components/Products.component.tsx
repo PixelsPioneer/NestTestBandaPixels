@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import type { Element } from '../interfaces/Element.component';
-import { Card } from './ProductCard.component';
+import { ProductCard } from './ProductCard.component';
 import styles from './product-list.module.css';
 import { toastError, toastSuccess, toastWarning } from './ToastNotification.component';
 import { apiEndpoints} from '../constants/constants';
 
-export const Api: React.FC = () => {
+export const ProductsComponent: React.FC = () => {
     const [elements, setElements] = useState<Element[]>([]);
 
     useEffect(() => {
@@ -41,7 +41,7 @@ export const Api: React.FC = () => {
           ) : (
             <ul className={styles.cardContainer}>
                 {elements.map((element) => (
-                  <Card
+                  <ProductCard
                     key={element.id}
                     element={element}
                     onDelete={() => handleDelete(element.id)}
