@@ -51,7 +51,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
   async deleteProductCache(): Promise<void> {
     await this.redisClient.del(CacheKeys.PRODUCTS);
-    this.logger.log('Cache for the key ${CacheKeys.PRODUCTS} has been cleared');
+    this.logger.log(`Cache for the key ${CacheKeys.PRODUCTS} has been cleared`);
   }
 
   async onModuleDestroy() {
