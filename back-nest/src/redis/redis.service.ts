@@ -2,6 +2,8 @@ import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import Redis from 'ioredis';
 
+import { CacheKeys } from './cache-keys.constant';
+
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(RedisService.name);
@@ -48,8 +50,8 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   async deleteProductCache(): Promise<void> {
-    await this.redisClient.del('all_products');
-    this.logger.log('Cache for the key "all_products" has been cleared');
+    await this.redisClient.del(CacheKeys.PRODUCTS);
+    this.logger.log('Cache for the key ${CacheKeys.PRODUCTS} has been cleared');
   }
 
   async onModuleDestroy() {

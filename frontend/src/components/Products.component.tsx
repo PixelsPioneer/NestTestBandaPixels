@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import type { Element } from '../interfaces/Element.component';
-import { Card } from './Card.component';
+import { Card } from './ProductCard.component';
 import styles from './product-list.module.css';
 import { toastError, toastSuccess, toastWarning } from './ToastNotification.component';
 import { apiEndpoints} from '../constants/constants';
