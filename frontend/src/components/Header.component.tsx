@@ -14,14 +14,11 @@ export const Header: React.FC<HeaderProps> = ({ toggleTheme, theme }) => {
     setCurrentTheme(theme);
   }, [theme]);
 
-  const handleToggleTheme = () => {
-    toggleTheme();
-  };
 
   return (
     <header className={styles.header}>
       <div className={styles.logo}>My App</div>
-      <div className={styles['theme-toggle-container']} onClick={handleToggleTheme}>
+      <div className={styles['theme-toggle-container']} onClick={toggleTheme}>
         <div
           className={`${styles['theme-toggle']} ${currentTheme === Themes.DARK ? styles.dark : styles.light}`}
         >
