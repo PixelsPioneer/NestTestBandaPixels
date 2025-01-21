@@ -64,4 +64,13 @@ export class ProductService {
       }),
     );
   }
+
+  async deleteProduct(id: number): Promise<void> {
+    await this.prisma.product.delete({
+      where: { id },
+    });
+    this.logger.log('Product has been deleted');
+
+    await this.redisService.deleteProductCache();
+  }
 }

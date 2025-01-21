@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Delete, Param } from '@nestjs/common';
 import { product } from '@prisma/client';
 
 import { ProductService } from './products.services';
@@ -10,5 +10,11 @@ export class ProductController {
   @Get()
   async getAllProducts(): Promise<product[]> {
     return this.productService.getAllProducts();
+  }
+
+  @Delete(':id')
+  async deleteProduct(@Param('id') id: string) {
+    const productId = +id;
+    await this.productService.deleteProduct(productId);
   }
 }

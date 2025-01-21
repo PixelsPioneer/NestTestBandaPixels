@@ -1,0 +1,78 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: var(--header-background-color);
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.theme-toggle-container {
+    cursor: pointer;
+}
+
+.theme-toggle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100px;
+    height: 40px;
+    background-color: transparent;
+    border: 2px solid var(--text-color);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.label {
+    flex: 1;
+    text-align: center;
+    z-index: 2;
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.slider {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 44px;
+    height: 32px;
+    background-color: var(--text-color);
+    border-radius: 50%;
+    z-index: 1;
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle.light .slider {
+    transform: translateX(0);
+}
+
+.theme-toggle.dark .slider {
+    transform: translateX(50px);
+}
+
+
+.theme-toggle:hover {
+    background-color: #3fc828;
+}
+
+.dark-theme {
+    background-color: var(--header-background-color);
+    color: var(--text-color);
+}
+
+.light-theme {
+    background-color: var(--header-background-color);
+    color: var(--text-color);
+}
+
+.theme-toggle.dark .theme-toggle-slider {
+    transform: translateX(25px);
+}
