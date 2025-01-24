@@ -20,6 +20,7 @@ body {
     --dark-grey: #232222;
     --grey: #CCC;
     --shadow: #0000007F;
+    --form: #3c3c3c;
     --white-shadow: #FFFFFFBD;
     --confirm-color: #268e12;
     --confirm-color-hover: #126007;
@@ -43,6 +44,9 @@ body {
     --close-button-hover: var(--cancel-color);
     --close-button-background-hover: var(--white);
     --close-button-border: var(--white);
+    --link-color: var(--grey);
+    --link-color-hover: var(--white);
+    --signin-form: var(--form);
 }
 
 .light-theme {
@@ -57,4 +61,7 @@ body {
     --close-button-hover: var(--cancel-color);
     --close-button-background-hover: var(--white);
     --close-button-border: var(--black);
+    --link-color: var(--dark-grey);
+    --link-color-hover: var(--black);
+    --signin-form: var(--grey);
 }

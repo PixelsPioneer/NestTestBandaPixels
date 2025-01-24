@@ -1,4 +1,5 @@
 import React from 'react';
+
 import styles from './modal.module.css';
 
 interface ModalFooterButtonsProps {
@@ -9,23 +10,17 @@ interface ModalFooterButtonsProps {
 }
 
 export const ModalFooterButtons: React.FC<ModalFooterButtonsProps> = ({
- onConfirm,
- onClose,
- confirmLabel = 'Yes',
- closeLabel = 'No',
+  onConfirm,
+  onClose,
+  confirmLabel = 'Yes',
+  closeLabel = 'No',
 }) => {
   return (
     <div className={styles.modalFooter}>
-      <button
-        className={`${styles.modalButton} ${styles.modalButtonConfirm}`}
-        onClick={onConfirm}
-      >
+      <button className={`${styles.modalButton} ${styles.modalButtonConfirm}`} onClick={onConfirm}>
         {confirmLabel}
       </button>
-      <button
-        className={`${styles.modalButton} ${styles.modalButtonClose}`}
-        onClick={onClose}
-      >
+      <button className={`${styles.modalButton} ${styles.modalButtonClose}`} onClick={onClose}>
         {closeLabel}
       </button>
     </div>

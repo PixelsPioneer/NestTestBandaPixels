@@ -1,6 +1,8 @@
-import { FC, ReactNode, useEffect } from 'react';
-import styles from './modal.module.css';
+import type { FC, ReactNode } from 'react';
+import React, { useEffect } from 'react';
+
 import { ModalFooterButtons } from './ModalFooterButtons.component';
+import styles from './modal.module.css';
 
 interface ModalProps {
   isVisible: boolean;

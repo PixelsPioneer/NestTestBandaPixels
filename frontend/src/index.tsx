@@ -1,13 +1,22 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-ReactDOM.render(
+const queryClient = new QueryClient();
+
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <App />
+    <QueryClientProvider client={queryClient}>
+      <ToastContainer />
+      <App />
+    </QueryClientProvider>
   </React.StrictMode>,
-  document.getElementById('root')
 );
 
 reportWebVitals(console.log);
