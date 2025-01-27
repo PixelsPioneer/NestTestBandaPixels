@@ -1,4 +1,4 @@
-.eslintrc.json
+.eslintrc.js
 node_modules
 build
 dist

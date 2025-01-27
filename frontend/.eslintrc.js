@@ -3,8 +3,6 @@ const path = require('path');
 
 module.exports = {
 	extends: [
-		'@remix-run/eslint-config',
-		'@remix-run/eslint-config/node',
 		'plugin:@tanstack/query/recommended',
 		'plugin:prettier/recommended',
 		'plugin:tailwindcss/recommended',
