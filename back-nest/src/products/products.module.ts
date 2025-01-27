@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 
 import { ProductService } from './products.services';
-import { ProductController } from './products.contoller';
+import { ProductController } from './products.controller';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Global()
