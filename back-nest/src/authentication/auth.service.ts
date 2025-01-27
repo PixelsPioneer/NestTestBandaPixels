@@ -1,12 +1,12 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { UsersService } from '../users/users.service';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
+    private prisma: PrismaService,
     private jwtService: JwtService,
   ) {}
 
@@ -14,9 +14,11 @@ export class AuthService {
     login: string,
     password: string,
   ): Promise<{ access_token: string }> {
-    const user = await this.usersService.findOne(login);
+    const user = await this.prisma.user.findUnique({
+      where: { login },
+    });
 
-    if (user?.password !== password) {
+    if (!user || user.password !== password) {
       throw new UnauthorizedException('Invalid login or password');
     }
 
