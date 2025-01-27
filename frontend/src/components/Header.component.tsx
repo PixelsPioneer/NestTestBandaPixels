@@ -54,5 +54,3 @@ export const Header: React.FC<HeaderProps> = ({ toggleTheme, theme }) => {
     </header>
   );
 };
-
-export default Header;
