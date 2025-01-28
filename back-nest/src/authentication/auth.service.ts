@@ -1,7 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcryptjs';
 
 import { PrismaService } from '../../prisma/prisma.service';
+import { SignInDto } from '../dto/signIn.dto';
 
 @Injectable()
 export class AuthService {
@@ -10,21 +12,24 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(
-    login: string,
-    password: string,
-  ): Promise<{ access_token: string }> {
+  async signIn(payload: SignInDto): Promise<{ access_token: string }> {
+    const { login, password } = payload;
+
     const user = await this.prisma.user.findUnique({
       where: { login },
     });
 
-    if (!user || user.password !== password) {
+    console.log({ user, payload });
+
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid login or password');
     }
 
-    const payload = { sub: user.user_id, role: user.role };
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: await this.jwtService.signAsync({
+        sub: user.user_id,
+        role: user.role,
+      }),
     };
   }
 }
