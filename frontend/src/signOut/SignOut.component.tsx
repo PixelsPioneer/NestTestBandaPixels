@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useTokenContext } from './TokenContext';
+import { useTokenContext } from '../tokenContext/TokenContext';
 
 export const SignOut: React.FC = () => {
   const navigate = useNavigate();

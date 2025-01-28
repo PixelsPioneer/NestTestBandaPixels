@@ -7,7 +7,6 @@ import { ScraperModule } from './sсrapers/scrapers.module';
 import { RedisModule } from './redis/redis.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuthModule } from './authentication/auth.module';
-import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -40,7 +39,6 @@ import { UsersModule } from './users/users.module';
     ScraperModule,
     RedisModule,
     PrismaModule,
-    UsersModule,
     AuthModule,
   ],
   providers: [],

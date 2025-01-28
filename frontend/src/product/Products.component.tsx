@@ -4,8 +4,8 @@ import axios from 'axios';
 
 import { apiEndpoints } from '../constants/constants';
 import type { Element } from '../interfaces/Element.component';
+import { toastError, toastSuccess } from '../notification/ToastNotification.component';
 import { ProductCard } from './ProductCard.component';
-import { toastError, toastSuccess } from './ToastNotification.component';
 import styles from './product-list.module.css';
 
 export const ProductsComponent: React.FC = () => {

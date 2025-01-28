@@ -5,8 +5,8 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 
 import { apiEndpoints } from '../constants/constants';
-import { toastSuccess } from './ToastNotification.component';
-import { useTokenContext } from './TokenContext';
+import { toastSuccess } from '../notification/ToastNotification.component';
+import { useTokenContext } from '../tokenContext/TokenContext';
 import styles from './signin.module.css';
 
 export const SignIn: React.FC = () => {
@@ -17,7 +17,10 @@ export const SignIn: React.FC = () => {
 
   const signInMutation = useMutation({
     mutationFn: async ({ login, password }: { login: string; password: string }) => {
-      const response = await axios.post(apiEndpoints.auth.signIn, { login, password });
+      const response = await axios.post(apiEndpoints.auth.signIn, {
+        login,
+        password,
+      });
 
       const profileResponse = await axios.get(apiEndpoints.auth.profile, {
         headers: { Authorization: `Bearer ${response.data.access_token}` },

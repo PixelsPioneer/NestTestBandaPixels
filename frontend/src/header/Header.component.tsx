@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Themes } from '../constants/constants';
-import { useTokenContext } from './TokenContext';
+import { useTokenContext } from '../tokenContext/TokenContext';
 import styles from './header.module.css';
 
 interface HeaderProps {
@@ -20,7 +20,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleTheme, theme }) => {
 
   return (
     <header className={styles.header}>
-      <div className={styles.logo}>My App</div>
+      <div className={styles.logo}>Scraper</div>
       <nav className={styles.nav}>
         <ul className={styles.navList}>
           <li className={styles.navItem}>
@@ -30,6 +30,9 @@ export const Header: React.FC<HeaderProps> = ({ toggleTheme, theme }) => {
           </li>
           {!token && (
             <li className={styles.navItem}>
+              <Link to="/signup" className={styles.navLink}>
+                Sign Up
+              </Link>
               <Link to="/signin" className={styles.navLink}>
                 Sign In
               </Link>

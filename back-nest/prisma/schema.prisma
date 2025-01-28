@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  guest
+  user
+  admin
+}
+
 model product {
   id             Int     @id @default(autoincrement())
   title          String  @unique @db.VarChar(256)
@@ -21,4 +27,11 @@ model product {
   hasDiscount    Boolean @default(false)
 
   @@unique([title, source])
+}
+
+model user {
+  user_id  Int    @id @default(autoincrement())
+  login    String @unique @db.VarChar(50)
+  password String @db.VarChar(256)
+  role     Role
 }
