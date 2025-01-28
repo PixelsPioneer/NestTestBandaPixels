@@ -2,8 +2,7 @@ import { Controller, Get, Delete, Param, UseGuards } from '@nestjs/common';
 import { product } from '@prisma/client';
 
 import { ProductService } from './products.services';
-import { AuthGuard, RoleGuard } from '../authentication/auth.guard';
-import { Roles } from '../decorators/roles.decorator';
+import { AuthGuard, RolesGuard } from '../authentication/auth.guard';
 
 @Controller('product')
 export class ProductController {
@@ -13,8 +12,8 @@ export class ProductController {
   async getAllProducts(): Promise<product[]> {
     return this.productService.getAllProducts();
   }
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles()
+
+  @UseGuards(AuthGuard, RolesGuard())
   @Delete(':id')
   async deleteProduct(@Param('id') id: string) {
     const productId = +id;
