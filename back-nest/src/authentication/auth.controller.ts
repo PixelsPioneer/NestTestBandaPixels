@@ -10,26 +10,44 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import { GetUser } from '../decorators/get-user.decorator';
+import { User } from '../decorators/user.decorator';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { RegisterService } from './reg.service';
+import { SignUpDto } from '../dto/signup.dto';
 import { SignInDto } from '../dto/signIn.dto';
 import { UserDto } from '../dto/user.dto';
+import { CheckLoginDto } from '../dto/checkLogin.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly regService: RegisterService,
+  ) {}
+
+  @Post('check-login')
+  async checkLogin(@Body() checkLogin: CheckLoginDto) {
+    const isAvalible = await this.regService.checkLoginAvailability(checkLogin);
+    return isAvalible;
+  }
+
+  @Post('signup')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async signup(@Body() user: SignUpDto) {
+    return this.regService.signup(user);
+  }
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
   @UsePipes(new ValidationPipe({ whitelist: true }))
   signIn(@Body() body: SignInDto) {
-    return this.authService.signIn(body.login, body.password);
+    return this.authService.signIn(body);
   }
 
   @UseGuards(AuthGuard)
   @Get('profile')
-  getProfile(@GetUser() user: UserDto) {
+  getProfile(@User() user: UserDto) {
     return user;
   }
 }
