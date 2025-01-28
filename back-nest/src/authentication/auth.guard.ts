@@ -4,10 +4,12 @@ import {
   Injectable,
   UnauthorizedException,
   ForbiddenException,
+  mixin,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
+import { Role } from '@prisma/client';
 
 import { jwtConstants } from './constants';
 
@@ -38,27 +40,26 @@ export class AuthGuard implements CanActivate {
   }
 }
 
-@Injectable()
-export class RoleGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+export const RolesGuard = (roles: Role[] = []): any => {
+  class RoleGuardMixin implements CanActivate {
+    constructor(private readonly reflector: Reflector) {}
 
-  canActivate(context: ExecutionContext): boolean {
-    const roles = this.reflector.get<string[]>('roles', context.getHandler());
-    if (!roles) {
+    canActivate(context: ExecutionContext): boolean {
+      const request = context.switchToHttp().getRequest();
+      const user = request.user;
+
+      if (user.role === 'admin') {
+        return true;
+      }
+
+      if (!user || !roles.includes(user.role)) {
+        throw new ForbiddenException('Access denied');
+      }
+
       return true;
     }
-
-    const request = context.switchToHttp().getRequest();
-    const user = request.user;
-
-    if (user.role === 'admin') {
-      return true;
-    }
-
-    if (!user || !roles.includes(user.role)) {
-      throw new ForbiddenException('Access denied');
-    }
-
-    return true;
   }
-}
+
+  const guard = mixin(RoleGuardMixin);
+  return guard;
+};
