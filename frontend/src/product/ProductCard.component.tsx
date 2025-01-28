@@ -7,8 +7,8 @@ import AuthGuard from '../authGuard/AuthGuard.component';
 import { apiEndpoints } from '../constants/constants';
 import { useToken } from '../hooks/useToken';
 import type { Element } from '../interfaces/Element.component';
-import { Modal } from './Modal.component';
-import { toastError } from './ToastNotification.component';
+import { Modal } from '../modalWindow/Modal.component';
+import { toastError } from '../notification/ToastNotification.component';
 import styles from './product-list.module.css';
 
 export interface CardProps {
@@ -67,7 +67,9 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
           alt={element.title || 'No title available'}
           onClick={handleButtonClick}
         />
-        <p className={styles.productTitle}>{element.title}</p>
+        <p className={styles.productTitle}>
+          {(element.title as string).length > 60 ? `${(element.title as string).slice(0, 60)}...` : element.title}
+        </p>
         <div className={styles.productInfoContainer}>
           <div className={styles.priceContainer}>
             {element.hasDiscount && <p className={styles.oldPrice}>{element.price}₴</p>}

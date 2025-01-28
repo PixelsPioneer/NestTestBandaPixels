@@ -6,8 +6,10 @@ export const apiEndpoints = {
     productDelete: (id: string) => `${backendUrl}/product/${id}`,
   },
   auth: {
+    signUp: `${backendUrl}/auth/signup`,
     signIn: `${backendUrl}/auth/login`,
     profile: `${backendUrl}/auth/profile`,
+    checkLogin: `${backendUrl}/auth/check-login`,
   },
 };
 
