@@ -30,18 +30,6 @@ export const Signup: React.FC = () => {
     }));
   };
 
-  const checkLoginAvailability = async (login: string) => {
-    try {
-      const response = await axios.post(apiEndpoints.auth.checkLogin, {
-        login,
-      });
-      return response.data;
-    } catch (err: any) {
-      toastError(err.response?.data?.message || 'Error checking login availability.');
-      return false;
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -57,12 +45,6 @@ export const Signup: React.FC = () => {
 
     if (formData.login.length < 4) {
       toastWarning('Login must be at least 4 characters long.');
-      return;
-    }
-
-    const isLoginAvailable = await checkLoginAvailability(formData.login);
-    if (!isLoginAvailable) {
-      toastError('This login is already taken. Please choose another one.');
       return;
     }
 
