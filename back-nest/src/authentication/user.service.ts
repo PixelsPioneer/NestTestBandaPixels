@@ -1,6 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { user } from '@prisma/client';
-import * as bcrypt from 'bcryptjs';
 
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -14,14 +13,12 @@ export class UsersService {
     });
   }
 
-  async createUser(login: string, password: string): Promise<user> {
+  async createUser(login: string, hashedPassword: string): Promise<user> {
     const existingUser = await this.findUserByLogin(login);
 
     if (existingUser) {
       throw new BadRequestException('User with this login already exists');
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
 
     return this.prisma.user.create({
       data: {

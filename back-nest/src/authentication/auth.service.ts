@@ -35,7 +35,9 @@ export class AuthService {
   ): Promise<{ message: string; user: { login: string; role: string } }> {
     const { login, password } = payload;
 
-    const newUser = await this.usersService.createUser(login, password);
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await this.usersService.createUser(login, hashedPassword);
 
     return {
       message: 'User created successfully',

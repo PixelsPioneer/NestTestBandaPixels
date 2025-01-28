@@ -48,12 +48,12 @@ export const RolesGuard = (roles: Role[] = []): any => {
       const request = context.switchToHttp().getRequest();
       const user = request.user;
 
-      if (user.role === 'admin') {
-        return true;
-      }
-
       if (!user) {
         throw new ForbiddenException('Access denied');
+      }
+
+      if (user.role === 'admin') {
+        return true;
       }
 
       if (!roles.includes(user.role)) {
