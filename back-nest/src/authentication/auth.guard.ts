@@ -52,7 +52,11 @@ export const RolesGuard = (roles: Role[] = []): any => {
         return true;
       }
 
-      if (!user || !roles.includes(user.role)) {
+      if (!user) {
+        throw new ForbiddenException('Access denied');
+      }
+
+      if (!roles.includes(user.role)) {
         throw new ForbiddenException('Access denied');
       }
 
