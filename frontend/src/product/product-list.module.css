@@ -59,6 +59,7 @@
   object-fit: cover;
   border-radius: 20px;
   margin: auto;
+  cursor: pointer;
 }
 
 .productTitle {
@@ -84,6 +85,47 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
+}
+
+.ratingProductContainer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.starsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 10px;
+  gap: 3px;
+}
+
+.halfStar {
+  color: transparent;
+  background: linear-gradient(to right, gold 50%, #ddd 50%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  font-size: 18px;
+}
+
+.filledStar {
+  color: var(--gold);
+  font-size: 18px;
+}
+
+.emptyStar {
+  color: var(--header-grey);
+  font-size: 18px;
+}
+
+.ratingText {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 5px;
 }
 
 .priceContainer {
@@ -112,8 +154,8 @@
   margin-right: auto;
   height: auto;
   color: var(--discount-price);
-  margin-bottom: -10px;
-  margin-top: -15%;
+  margin-bottom: -20px;
+  margin-top: auto;
   font-weight: 600;
   font-size: 22px;
 }
@@ -148,3 +190,4 @@
 .addProductToCardContainer {
   position: relative;
 }
+

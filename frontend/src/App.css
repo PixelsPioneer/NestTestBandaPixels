@@ -16,7 +16,9 @@ body {
 
 :root {
   --white: #fff;
+  --white2: #ededed;
   --black: #000000;
+  --gold: #FFD700FF;
   --dark-grey: #232222;
   --grey: #ccc;
   --header-grey: #777575;
@@ -27,7 +29,7 @@ body {
   --confirm-color-hover: #126007;
   --cancel-color: #e41d1d;
   --cancel-color-hover: #c50d0d;
-  --discount-price: #f60006;
+  --discount-price: #dd131a;
   --selected-card: #4caf50;
   --card-shadow: #00000033;
   --card-borders: #282c34;
@@ -51,7 +53,7 @@ body {
 }
 
 .light-theme {
-  --background-color: var(--white);
+  --background-color: var(--white2);
   --text-color: var(--black);
   --text-color-price: var(--black);
   --modal-window-background-color: var(--white);

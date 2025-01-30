@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import axios from 'axios';
 
@@ -19,14 +20,7 @@ export interface CardProps {
 export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
   const { token } = useToken();
   const [isModalVisible, setModalVisible] = useState(false);
-
-  const handleButtonClick = () => {
-    if (element.subtitle) {
-      window.open(element.subtitle, '_blank');
-    } else {
-      toastError('No subtitle link available');
-    }
-  };
+  const navigate = useNavigate();
 
   const handleDelete = async (id: number) => {
     setModalVisible(false);
@@ -48,6 +42,10 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
     }
   };
 
+  const goToProductPage = () => {
+    navigate(`/product/${element.id}`);
+  };
+
   return (
     <>
       <li className={styles.card} key={element.id}>
@@ -60,17 +58,37 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
             </div>
           }
         </AuthGuard>
-
         <img
           className={styles.productImages}
           src={element.profileImage}
           alt={element.title || 'No title available'}
-          onClick={handleButtonClick}
+          onClick={goToProductPage}
         />
-        <p className={styles.productTitle}>
+        <p className={styles.productTitle} onClick={goToProductPage} style={{ cursor: 'pointer' }}>
           {(element.title as string).length > 60 ? `${(element.title as string).slice(0, 60)}...` : element.title}
         </p>
+
         <div className={styles.productInfoContainer}>
+          <div className={styles.ratingProductContainer}>
+            <div className={styles.starsContainer}>
+              {Array.from({ length: 5 }, (_, index) => {
+                const rating = element?.rating ?? 0;
+                const roundedRating = Math.round(rating * 2) / 2;
+                const isFullStar = index < Math.floor(roundedRating);
+                const isHalfStar = index === Math.floor(roundedRating) && roundedRating % 1 !== 0;
+
+                return (
+                  <span
+                    key={index}
+                    className={isFullStar ? styles.filledStar : isHalfStar ? styles.halfStar : styles.emptyStar}>
+                    ★
+                  </span>
+                );
+              })}
+            </div>
+            <span className={styles.ratingText}>{(element.rating ?? 0).toFixed(1)}</span>
+          </div>
+
           <div className={styles.priceContainer}>
             {element.hasDiscount && <p className={styles.oldPrice}>{element.price}₴</p>}
             <p className={styles.productPrice}>{element.hasDiscount ? element.newPrice : element.price}₴</p>
