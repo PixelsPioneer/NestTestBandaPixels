@@ -25,6 +25,7 @@ model product {
   profileImage   String? @db.Text
   source         String  @db.VarChar(255)
   hasDiscount    Boolean @default(false)
+  rating         Float?
 
   @@unique([title, source])
 }
