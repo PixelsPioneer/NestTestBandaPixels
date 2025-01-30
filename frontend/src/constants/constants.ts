@@ -3,6 +3,7 @@ export const backendUrl = process.env.REACT_APP_API_BASE_URL;
 export const apiEndpoints = {
   products: {
     products: `${backendUrl}/product`,
+    productID: (id: string) => `${backendUrl}/product/${id}`,
     productDelete: (id: string) => `${backendUrl}/product/${id}`,
   },
   auth: {

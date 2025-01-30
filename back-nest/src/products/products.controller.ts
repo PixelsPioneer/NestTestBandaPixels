@@ -13,6 +13,11 @@ export class ProductController {
     return this.productService.getAllProducts();
   }
 
+  @Get(':id')
+  async getProduct(@Param('id') id: string): Promise<product> {
+    return this.productService.getProductById(Number(id));
+  }
+
   @UseGuards(AuthGuard, RolesGuard())
   @Delete(':id')
   async deleteProduct(@Param('id') id: string) {

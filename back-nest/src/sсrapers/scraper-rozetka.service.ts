@@ -56,6 +56,9 @@ export class ScraperRozetkaService {
     });
 
     await page.waitForSelector('.goods-tile', { timeout: 30000 });
+    await page.waitForSelector('.goods-tile__hidden-holder', {
+      timeout: 30000,
+    });
     await page.waitForSelector('.goods-tile__picture', { timeout: 30000 });
     await page.waitForSelector('img[loading="lazy"], img[src]', {
       timeout: 60000,
@@ -101,14 +104,39 @@ export class ScraperRozetkaService {
 
       const hasDiscount = !!oldPrice;
 
-      const specifications =
-        $(element).find('.goods-tile__specifications').text().trim() ||
-        'No specifications available';
+      const specifications: Record<string, string> = {};
+
+      $(element)
+        .find('.goods-tile__params-list li')
+        .each((_, specElement) => {
+          const label = $(specElement)
+            .find('.goods-tile__params-label')
+            .text()
+            .trim();
+          const value =
+            $(specElement).find('a').text().trim() ||
+            $(specElement).text().trim();
+
+          if (label && value) {
+            specifications[label] = value;
+          }
+        });
       const type = 'Computer';
 
       const profileImage = $(element)
         .find('.goods-tile__picture img')
         .attr('src');
+
+      const ratingStyle = $(element).find('.stars__rating').attr('style');
+
+      let rating: number | null = null;
+      if (ratingStyle) {
+        const match = ratingStyle.match(/width:\s*calc\((\d+)%/);
+        if (match) {
+          const percentage = parseInt(match[1], 10);
+          rating = parseFloat((percentage / 20).toFixed(1));
+        }
+      }
 
       if (title && profileImage && price) {
         const productData: ScrapedProduct = {
@@ -117,10 +145,11 @@ export class ScraperRozetkaService {
           description,
           price,
           newPrice: hasDiscount ? parseFloat(currentPrice) : null,
-          specifications,
+          specifications: JSON.stringify(specifications),
           type,
           profileImage,
           hasDiscount,
+          rating,
           source: Sources.Rozetka,
         };
 

@@ -7,6 +7,7 @@ import './App.css';
 import { Header } from './header/Header.component';
 import { useTheme } from './hooks/useTheme';
 import { ProductsComponent } from './product/Products.component';
+import { ProductPage } from './productPages/productPage.component';
 import { SignIn } from './signIn/SingIn.component';
 import { SignOut } from './signOut/SignOut.component';
 import { Signup } from './signUp/SignUp.component';
@@ -22,6 +23,7 @@ function App() {
           <Header toggleTheme={toggleTheme} theme={theme} />
           <Routes>
             <Route path="/" element={<ProductsComponent />} />
+            <Route path="/product/:id" element={<ProductPage />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signout" element={<SignOut />} />

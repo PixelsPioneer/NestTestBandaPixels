@@ -36,6 +36,12 @@ export class ProductService {
     return products;
   }
 
+  async getProductById(id: number): Promise<product> {
+    return this.prisma.product.findUnique({
+      where: { id },
+    });
+  }
+
   async upsertProducts(products: ScrapedProduct[]): Promise<void> {
     await Promise.all(
       products.map((productData) => {

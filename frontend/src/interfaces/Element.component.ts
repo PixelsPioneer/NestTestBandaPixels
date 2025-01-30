@@ -8,7 +8,8 @@ export interface Element {
   profileImage: string;
   link: string;
   source: string;
-  specification: string;
+  specifications: string;
   type: string;
   hasDiscount: boolean;
+  rating: number | null;
 }
