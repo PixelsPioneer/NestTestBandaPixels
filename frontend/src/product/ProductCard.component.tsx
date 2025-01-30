@@ -10,6 +10,7 @@ import { useToken } from '../hooks/useToken';
 import type { Element } from '../interfaces/Element.component';
 import { Modal } from '../modalWindow/Modal.component';
 import { toastError } from '../notification/ToastNotification.component';
+import { RatingStars } from '../ratingProduct/Rating.Component';
 import styles from './product-list.module.css';
 
 export interface CardProps {
@@ -64,29 +65,15 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
           alt={element.title || 'No title available'}
           onClick={goToProductPage}
         />
-        <p className={styles.productTitle} onClick={goToProductPage} style={{ cursor: 'pointer' }}>
+        <p className={styles.productTitle} onClick={goToProductPage}>
           {(element.title as string).length > 60 ? `${(element.title as string).slice(0, 60)}...` : element.title}
         </p>
 
         <div className={styles.productInfoContainer}>
           <div className={styles.ratingProductContainer}>
-            <div className={styles.starsContainer}>
-              {Array.from({ length: 5 }, (_, index) => {
-                const rating = element?.rating ?? 0;
-                const roundedRating = Math.round(rating * 2) / 2;
-                const isFullStar = index < Math.floor(roundedRating);
-                const isHalfStar = index === Math.floor(roundedRating) && roundedRating % 1 !== 0;
-
-                return (
-                  <span
-                    key={index}
-                    className={isFullStar ? styles.filledStar : isHalfStar ? styles.halfStar : styles.emptyStar}>
-                    ★
-                  </span>
-                );
-              })}
+            <div className={styles.productInfoContainer}>
+              <RatingStars rating={element?.rating ?? 0} />
             </div>
-            <span className={styles.ratingText}>{(element.rating ?? 0).toFixed(1)}</span>
           </div>
 
           <div className={styles.priceContainer}>

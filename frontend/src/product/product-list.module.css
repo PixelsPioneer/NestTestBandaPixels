@@ -95,39 +95,6 @@
   margin-bottom: 5px;
 }
 
-.starsContainer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  margin-top: 10px;
-  gap: 3px;
-}
-
-.halfStar {
-  color: transparent;
-  background: linear-gradient(to right, gold 50%, #ddd 50%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  font-size: 18px;
-}
-
-.filledStar {
-  color: var(--gold);
-  font-size: 18px;
-}
-
-.emptyStar {
-  color: var(--header-grey);
-  font-size: 18px;
-}
-
-.ratingText {
-  margin-top: 10px;
-  font-size: 14px;
-  font-weight: bold;
-  margin-left: 5px;
-}
-
 .priceContainer {
   display: flex;
   flex-direction: column;

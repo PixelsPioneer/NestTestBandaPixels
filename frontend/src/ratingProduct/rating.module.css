@@ -1,0 +1,36 @@
+.ratingProductContainer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.starsContainer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 10px;
+    gap: 3px;
+}
+
+.halfStar {
+    color: transparent;
+    background: linear-gradient(to right, gold 50%, #ddd 50%);
+    background-clip: text;
+    -webkit-background-clip: text;
+}
+
+.filledStar {
+    color: var(--gold);
+}
+
+.emptyStar {
+    color: var(--header-grey);
+}
+
+.ratingText {
+    margin-top: 10px;
+    font-weight: bold;
+    margin-left: 5px;
+}

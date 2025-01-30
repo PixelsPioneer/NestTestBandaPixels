@@ -7,6 +7,7 @@ import { apiEndpoints } from '../constants/constants';
 import { Element } from '../interfaces/Element.component';
 import { toastError } from '../notification/ToastNotification.component';
 import styles from '../productPages/productpage.module.css';
+import { RatingStars } from '../ratingProduct/Rating.Component';
 
 export const ProductPage: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
@@ -51,7 +52,9 @@ export const ProductPage: React.FC = () => {
     }
   })();
 
-  if (!product) return <div>Loading...</div>;
+  if (!product) {
+    return <div className={styles.productNotFound}>Product was not found</div>;
+  }
 
   return (
     <div className={styles.productContainer}>
@@ -86,23 +89,9 @@ export const ProductPage: React.FC = () => {
         </div>
 
         <div className={styles.ratingProductContainer}>
-          <div className={styles.starsContainer}>
-            {Array.from({ length: 5 }, (_, index) => {
-              const rating = product?.rating ?? 0;
-              const roundedRating = Math.round(rating * 2) / 2;
-              const isFullStar = index < Math.floor(roundedRating);
-              const isHalfStar = index === Math.floor(roundedRating) && roundedRating % 1 !== 0;
-
-              return (
-                <span
-                  key={index}
-                  className={isFullStar ? styles.filledStar : isHalfStar ? styles.halfStar : styles.emptyStar}>
-                  ★
-                </span>
-              );
-            })}
+          <div className={styles.productRatingContainer}>
+            <RatingStars rating={product?.rating ?? 0} />
           </div>
-          <span className={styles.ratingText}>{(product.rating ?? 0).toFixed(1)}</span>
         </div>
         <div className={styles.productButtonContainer}>
           <button className={styles.goToStoreButton} onClick={handleButtonClick}>
