@@ -9,4 +9,5 @@ export interface ScrapedProduct {
   source: string;
   newPrice: number | null;
   hasDiscount: boolean;
+  rating: number | null;
 }

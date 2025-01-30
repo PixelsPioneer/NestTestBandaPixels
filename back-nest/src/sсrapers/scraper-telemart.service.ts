@@ -85,6 +85,11 @@ export class ScraperTelemartService {
           '.product-item__footer-column',
         );
 
+        const rating = parseFloat(
+          element.querySelector('.rate-item__total')?.textContent?.trim() ||
+            null,
+        );
+
         const currentPrice =
           footerColumn?.querySelector('.product-cost')?.textContent?.trim() ||
           '0';
@@ -122,6 +127,7 @@ export class ScraperTelemartService {
           profileImage,
           hasDiscount,
           source,
+          rating,
         };
       });
     }, Sources.Telemart);
