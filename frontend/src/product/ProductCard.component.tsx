@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import axios from 'axios';
+import 'slick-carousel/slick/slick.css';
 
 import AuthGuard from '../authGuard/AuthGuard.component';
 import { apiEndpoints } from '../constants/constants';
@@ -11,6 +12,8 @@ import type { Element } from '../interfaces/Element.component';
 import { Modal } from '../modalWindow/Modal.component';
 import { toastError } from '../notification/ToastNotification.component';
 import { RatingStars } from '../ratingProduct/Rating.Component';
+import { Carousel } from '../slick/Carousel.component';
+import '../slick/slick-theme.css';
 import styles from './product-list.module.css';
 
 export interface CardProps {
@@ -59,12 +62,23 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
             </div>
           }
         </AuthGuard>
-        <img
-          className={styles.productImages}
-          src={element.profileImage}
-          alt={element.title || 'No title available'}
-          onClick={goToProductPage}
-        />
+        <div className={styles.carouselConatiner}>
+          <Carousel>
+            {Array.isArray(element.profileImage) &&
+              element.profileImage.map((imageUrl, index) => (
+                <div key={index} className={styles.ImgContainer}>
+                  <img
+                    key={index}
+                    className={styles.productImage}
+                    src={imageUrl}
+                    alt={element.title || 'No title available'}
+                    onClick={goToProductPage}
+                  />
+                </div>
+              ))}
+          </Carousel>
+        </div>
+
         <p className={styles.productTitle} onClick={goToProductPage}>
           {(element.title as string).length > 60 ? `${(element.title as string).slice(0, 60)}...` : element.title}
         </p>

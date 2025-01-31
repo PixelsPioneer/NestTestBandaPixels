@@ -5,7 +5,7 @@ export interface Element {
   description: string | null;
   price: number;
   newPrice: number | null;
-  profileImage: string;
+  profileImage: string[];
   link: string;
   source: string;
   specifications: string;
