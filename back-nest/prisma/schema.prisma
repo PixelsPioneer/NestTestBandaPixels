@@ -22,7 +22,7 @@ model product {
   newPrice       Float?
   specifications String  @default("No specifications available") @db.VarChar(2048)
   type           String  @db.VarChar(128)
-  profileImage   String? @db.Text
+  profileImage   Json?   @db.Json
   source         String  @db.VarChar(255)
   hasDiscount    Boolean @default(false)
   rating         Float?
