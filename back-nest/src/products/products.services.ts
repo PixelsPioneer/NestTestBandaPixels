@@ -79,4 +79,8 @@ export class ProductService {
 
     await this.redisService.deleteProductCache();
   }
+
+  async clearCacheProduct(): Promise<void> {
+    await this.redisService.deleteProductCache();
+  }
 }
