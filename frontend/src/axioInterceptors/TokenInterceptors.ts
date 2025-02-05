@@ -41,7 +41,6 @@ const getValidAccessToken = async () => {
   let accessToken = localStorage.getItem('accessToken');
 
   if (!accessToken || isTokenExpired(accessToken)) {
-    console.log('Access token expired. Attempting to refresh.');
     accessToken = await refreshAccessToken();
   }
 
@@ -53,9 +52,7 @@ axiosInstance.interceptors.request.use(
     try {
       const accessToken = await getValidAccessToken();
       if (accessToken) config.headers['Authorization'] = `Bearer ${accessToken}`;
-    } catch (error) {
-      console.warn('Failed to get valid access token:', error);
-    }
+    } catch (error) {}
     return config;
   },
   error => Promise.reject(error),
@@ -65,13 +62,11 @@ axiosInstance.interceptors.response.use(
   response => response,
   async error => {
     if (error.response?.status === 401) {
-      console.log('Interceptor caught 401 error. Trying to refresh token.');
       try {
         const newAccessToken = await refreshAccessToken();
         error.config.headers['Authorization'] = `Bearer ${newAccessToken}`;
         return axiosInstance(error.config);
       } catch (refreshError) {
-        console.error('Token refresh failed:', refreshError);
         return Promise.reject(refreshError);
       }
     }

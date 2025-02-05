@@ -12,12 +12,7 @@ export const SignOut: React.FC = () => {
 
   useEffect(() => {
     const signOut = async () => {
-      try {
-        await axios.delete(apiEndpoints.products.productClearCache());
-      } catch (error) {
-        console.error('Error clearing product cache:', error);
-      }
-
+      await axios.delete(apiEndpoints.products.productClearCache());
       updateToken(null);
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('role');
