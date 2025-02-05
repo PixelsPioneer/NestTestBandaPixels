@@ -10,9 +10,11 @@ import styles from './product-list.module.css';
 
 export const ProductsComponent: React.FC = () => {
   const [elements, setElements] = useState<Element[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(apiEndpoints.products.products);
         if (!response || !response.data) {
@@ -21,10 +23,13 @@ export const ProductsComponent: React.FC = () => {
         }
         setElements(response.data);
       } catch (error) {
+        console.error('Error fetching data:', error);
         toastError('Error fetching data.');
-        return;
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 

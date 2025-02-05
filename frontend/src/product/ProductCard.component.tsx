@@ -2,10 +2,10 @@ import type { FC } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import axios from 'axios';
 import 'slick-carousel/slick/slick.css';
 
 import AuthGuard from '../authGuard/AuthGuard.component';
+import axiosInstance from '../axioInterceptors/TokenInterceptors';
 import { apiEndpoints } from '../constants/constants';
 import { useToken } from '../hooks/useToken';
 import type { Element } from '../interfaces/Element.component';
@@ -34,7 +34,7 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
         Authorization: `Bearer ${token}`,
       };
 
-      const response = await axios.delete(apiEndpoints.products.productDelete(id.toString()), { headers });
+      const response = await axiosInstance.delete(apiEndpoints.products.productDelete(id.toString()), { headers });
 
       if (response.status === 200) {
         onDelete();

@@ -14,10 +14,10 @@ const AuthGuard: FC<AuthGuardProps> = ({ children, roles = [] }) => {
   const navigate = useNavigate();
   const userRole = localStorage.getItem('role');
 
-  if (!token) {
-    navigate('/signin');
-    return null;
-  }
+  // if (!token) {
+  //   navigate('/signin');
+  //   return null;
+  // }
 
   if (userRole === UserRoles.ADMIN) {
     return <>{children}</>;

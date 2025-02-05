@@ -7,7 +7,7 @@ export function useToken() {
 
   useEffect(() => {
     const storedToken = getToken();
-    setToken(storedToken); // Update state
+    setToken(storedToken);
   }, []);
 
   const updateToken = (newToken: string | null) => {
