@@ -12,6 +12,11 @@ export class UsersService {
       where: { login },
     });
   }
+  async findUserById(userId: number): Promise<user | null> {
+    return this.prisma.user.findUnique({
+      where: { user_id: userId },
+    });
+  }
 
   async createUser(login: string, hashedPassword: string): Promise<user> {
     const existingUser = await this.findUserByLogin(login);

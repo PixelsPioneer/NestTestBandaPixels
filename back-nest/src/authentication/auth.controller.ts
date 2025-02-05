@@ -34,6 +34,11 @@ export class AuthController {
     return this.authService.signIn(body);
   }
 
+  @Post('refresh')
+  async refresh(@Body() body: { refresh_token: string }) {
+    return this.authService.refreshToken(body.refresh_token);
+  }
+
   @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@User() user: UserDto) {
