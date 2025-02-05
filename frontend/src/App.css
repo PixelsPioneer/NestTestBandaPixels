@@ -52,6 +52,8 @@ body {
   --signin-form: var(--form);
   --carousel-active: var(--confirm-color);
   --carousel-color: var(--black);
+  --hover-button: var(--white2);
+  --hover-button-text: var(--black);
 }
 
 .light-theme {
@@ -71,4 +73,6 @@ body {
   --signin-form: var(--grey);
   --carousel-active: var(--black);
   --carousel-color: var(--grey);
+  --hover-button: var(--black);
+  --hover-button-text: var(--white);
 }

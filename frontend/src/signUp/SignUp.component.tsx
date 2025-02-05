@@ -19,7 +19,6 @@ export const Signup: React.FC = () => {
     password: '',
     confirmPassword: '',
   });
-
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,7 +63,6 @@ export const Signup: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.signupContainer}>
-        <h2 className={styles.title}>Sign Up</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className={styles.inputGroup}>
             <label htmlFor="login" className={styles.label}>
