@@ -146,7 +146,7 @@ export class ScraperRozetkaService {
         }
       }
 
-      if (title && profileImages.length > 0 && price) {
+      if (title && profileImages && price) {
         const productData: ScrapedProduct = {
           title,
           subtitle,
