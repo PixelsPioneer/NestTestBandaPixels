@@ -7,13 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  guest
-  user
-  admin
-}
-
-model product {
+model Product {
   id             Int     @id @default(autoincrement())
   title          String  @unique @db.VarChar(256)
   subtitle       String? @db.VarChar(256)
@@ -22,7 +16,7 @@ model product {
   newPrice       Float?
   specifications String  @default("No specifications available") @db.VarChar(2048)
   type           String  @db.VarChar(128)
-  profileImage   Json?   @db.Json
+  profileImages  Json
   source         String  @db.VarChar(255)
   hasDiscount    Boolean @default(false)
   rating         Float?
@@ -30,9 +24,15 @@ model product {
   @@unique([title, source])
 }
 
-model user {
+model User {
   user_id  Int    @id @default(autoincrement())
   login    String @unique @db.VarChar(50)
   password String @db.VarChar(256)
   role     Role
+}
+
+enum Role {
+  guest
+  user
+  admin
 }

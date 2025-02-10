@@ -77,8 +77,8 @@ export const ProductPage: React.FC = () => {
     <div className={styles.productContainer}>
       <div className={styles.productContainerImage}>
         <Slider {...carouselSettings} className={styles.carousel}>
-          {Array.isArray(product.profileImage) &&
-            product.profileImage.map((imageUrl, index) => (
+          {Array.isArray(product.profileImages) &&
+            product.profileImages.map((imageUrl, index) => (
               <img
                 key={index}
                 className={styles.productImage}

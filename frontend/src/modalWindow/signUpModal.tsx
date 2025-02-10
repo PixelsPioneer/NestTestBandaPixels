@@ -6,11 +6,9 @@ import { apiEndpoints } from '../constants/constants';
 import { toastError, toastSuccess, toastWarning } from '../notification/ToastNotification.component';
 import styles from './signup.module.css';
 
-interface SignupFormProps {
-  onClose: () => void;
-}
+interface SignupFormProps {}
 
-export const SignUpForm: React.FC<SignupFormProps> = ({ onClose }) => {
+export const SignUpForm: React.FC<SignupFormProps> = ({}) => {
   const [formData, setFormData] = useState({
     login: '',
     password: '',
@@ -50,7 +48,6 @@ export const SignUpForm: React.FC<SignupFormProps> = ({ onClose }) => {
       });
 
       toastSuccess('Signup successful! You can now log in.');
-      onClose();
     } catch (err: any) {
       toastError(err.response?.data?.message || 'An error occurred during signup.');
     }
@@ -108,3 +105,5 @@ export const SignUpForm: React.FC<SignupFormProps> = ({ onClose }) => {
     </div>
   );
 };
+
+export default SignUpForm;

@@ -48,11 +48,6 @@ export class ScraperTelemartService {
       );
 
       return items.map<ScrapedProduct>((element) => {
-        console.log('222222');
-        console.log('222222');
-        console.log('222222');
-        console.log('222222');
-        console.log('222222');
         const title =
           element
             .querySelector('.product-item__title a')
@@ -106,7 +101,7 @@ export class ScraperTelemartService {
           .map((img) => img.getAttribute('data-src')?.trim())
           .filter((dataSrc): dataSrc is string => !!dataSrc);
 
-        const profileImage = [
+        const profileImages = [
           ...carouseActive,
           ...carouselImages,
           ...carouseLazy,
@@ -155,7 +150,7 @@ export class ScraperTelemartService {
           newPrice: hasDiscount ? parsedNewPrice : null,
           specifications: JSON.stringify(specifications),
           type,
-          profileImage,
+          profileImages,
           hasDiscount,
           source,
           rating,

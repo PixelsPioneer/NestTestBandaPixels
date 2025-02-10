@@ -5,7 +5,6 @@ export const apiEndpoints = {
     products: `${backendUrl}/product`,
     productID: (id: string) => `${backendUrl}/product/${id}`,
     productDelete: (id: string) => `${backendUrl}/product/${id}`,
-    productClearCache: () => `${backendUrl}/product/cache`,
   },
   auth: {
     signUp: `${backendUrl}/auth/signup`,

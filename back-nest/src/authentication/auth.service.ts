@@ -6,8 +6,8 @@ import { Role } from '@prisma/client';
 import { UsersService } from './user.service';
 import { SignInDto } from '../dto/signIn.dto';
 import { SignUpDto } from '../dto/signup.dto';
-import { jwtConstants } from './constants';
-import { types } from './constants';
+import { jwtConfig } from './constants';
+import { tokenTypes } from './constants';
 
 @Injectable()
 export class AuthService {
@@ -27,7 +27,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid login or password');
     }
 
-    const { accessToken, refreshToken } = await this.generateTokens(
+    const { accessToken, refreshToken } = await this.generateAuthTokens(
       user.user_id,
       user.role,
     );
@@ -41,7 +41,7 @@ export class AuthService {
   async refreshToken(refresh_token: string) {
     try {
       const decoded = await this.jwtService.verifyAsync(refresh_token, {
-        secret: jwtConstants.refreshToken,
+        secret: jwtConfig.refreshToken,
       });
 
       const user = await this.usersService.findUserById(decoded.sub);
@@ -50,7 +50,7 @@ export class AuthService {
         throw new UnauthorizedException('User not found');
       }
 
-      const { accessToken, refreshToken } = await this.generateTokens(
+      const { accessToken, refreshToken } = await this.generateAuthTokens(
         user.user_id,
         user.role,
       );
@@ -79,15 +79,15 @@ export class AuthService {
     };
   }
 
-  async generateTokens(userId: number, role: Role = Role.user) {
+  async generateAuthTokens(userId: number, role: Role = Role.user) {
     const accessToken = await this.jwtService.signAsync(
-      { sub: userId, role, type: types.access },
-      { expiresIn: '1h' },
+      { sub: userId, role, type: tokenTypes.access },
+      { expiresIn: '20s' },
     );
 
     const refreshToken = await this.jwtService.signAsync(
-      { sub: userId, role, type: types.refresh },
-      { secret: jwtConstants.refreshToken, expiresIn: '1d' },
+      { sub: userId, role, type: tokenTypes.refresh },
+      { secret: jwtConfig.refreshToken, expiresIn: '2m' },
     );
 
     return { accessToken, refreshToken };

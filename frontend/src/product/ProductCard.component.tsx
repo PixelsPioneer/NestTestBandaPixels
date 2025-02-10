@@ -7,13 +7,13 @@ import 'slick-carousel/slick/slick.css';
 import AuthGuard from '../authGuard/AuthGuard.component';
 import axiosInstance from '../axioInterceptors/TokenInterceptors';
 import { apiEndpoints } from '../constants/constants';
-import { useToken } from '../hooks/useToken';
 import type { Element } from '../interfaces/Element.component';
 import { Modal } from '../modalWindow/Modal.component';
 import { toastError } from '../notification/ToastNotification.component';
 import { RatingStars } from '../ratingProduct/Rating.Component';
 import { Carousel } from '../slick/Carousel.component';
 import '../slick/slick-theme.css';
+import { useTokenContext } from '../tokenContext/TokenContext';
 import styles from './product-list.module.css';
 
 export interface CardProps {
@@ -22,7 +22,7 @@ export interface CardProps {
 }
 
 export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
-  const { token } = useToken();
+  const { accessToken } = useTokenContext();
   const [isModalVisible, setModalVisible] = useState(false);
   const navigate = useNavigate();
 
@@ -31,7 +31,7 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
 
     try {
       const headers = {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${accessToken}`,
       };
 
       const response = await axiosInstance.delete(apiEndpoints.products.productDelete(id.toString()), { headers });
@@ -64,8 +64,8 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
         </AuthGuard>
         <div className={styles.carouselConatiner}>
           <Carousel>
-            {Array.isArray(element.profileImage) &&
-              element.profileImage.map((imageUrl, index) => (
+            {Array.isArray(element.profileImages) &&
+              element.profileImages.map((imageUrl, index) => (
                 <div key={index} className={styles.ImgContainer}>
                   <img
                     key={index}

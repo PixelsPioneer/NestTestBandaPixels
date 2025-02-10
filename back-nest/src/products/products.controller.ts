@@ -1,12 +1,5 @@
-import {
-  Controller,
-  Get,
-  Delete,
-  Param,
-  UseGuards,
-  HttpCode,
-} from '@nestjs/common';
-import { product } from '@prisma/client';
+import { Controller, Get, Delete, Param, UseGuards } from '@nestjs/common';
+import { Product } from '@prisma/client';
 
 import { ProductService } from './products.services';
 import { AuthGuard, RolesGuard } from '../authentication/auth.guard';
@@ -16,12 +9,12 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
-  async getAllProducts(): Promise<product[]> {
+  async getAllProducts(): Promise<Product[]> {
     return this.productService.getAllProducts();
   }
 
   @Get(':id')
-  async getProduct(@Param('id') id: string): Promise<product> {
+  async getProduct(@Param('id') id: string): Promise<Product> {
     return this.productService.getProductById(Number(id));
   }
 
@@ -30,11 +23,5 @@ export class ProductController {
   async deleteProduct(@Param('id') id: string) {
     const productId = +id;
     await this.productService.deleteProduct(productId);
-  }
-
-  @Delete('cache')
-  @HttpCode(204)
-  async clearProductCache(): Promise<void> {
-    await this.productService.clearCacheProduct();
   }
 }

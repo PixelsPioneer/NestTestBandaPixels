@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 import { Themes } from '../constants/constants';
@@ -15,7 +14,7 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ toggleTheme, theme }) => {
-  const { token } = useTokenContext();
+  const { accessToken } = useTokenContext();
   const navigate = useNavigate();
   const [currentTheme, setCurrentTheme] = useState<Themes>(theme);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -30,34 +29,17 @@ export const Header: React.FC<HeaderProps> = ({ toggleTheme, theme }) => {
     setIsAuthModalOpen(true);
   };
 
-  const closeAuthModal = () => setIsAuthModalOpen(false);
-
-  const handleSignOut = () => {
-    navigate('/signout');
-  };
-
-  const handleProduct = () => {
-    navigate('/');
-  };
-
   return (
     <header className={styles.header}>
       <div className={styles.logo}>Scraper</div>
       <nav className={styles.nav}>
         <ul className={styles.navList}>
-          {!token && (
+          {accessToken && (
             <li className={styles.navItem}>
-              <button onClick={() => openAuthModal(true)} className={styles.AuthButton}>
-                Auth
-              </button>
-            </li>
-          )}
-          {token && (
-            <li className={styles.navItem}>
-              <button onClick={handleProduct} className={styles.productButton}>
+              <button onClick={() => navigate('/')} className={styles.productButton}>
                 Product
               </button>
-              <button onClick={handleSignOut} className={styles.signOutButton}>
+              <button onClick={() => navigate('/signout')} className={styles.signOutButton}>
                 Sign Out
               </button>
             </li>
@@ -72,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleTheme, theme }) => {
         </div>
       </div>
 
-      <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} isSignIn={isSignIn} />
+      <AuthModal isOpen={isAuthModalOpen} isSignIn={isSignIn} />
     </header>
   );
 };

@@ -1,19 +1,17 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import axios from 'axios';
-
-import { apiEndpoints } from '../constants/constants';
 import { useTokenContext } from '../tokenContext/TokenContext';
 
 export const SignOut: React.FC = () => {
   const navigate = useNavigate();
-  const { updateToken } = useTokenContext();
+  const { updateTokens } = useTokenContext();
 
   useEffect(() => {
     const signOut = async () => {
-      await axios.delete(apiEndpoints.products.productClearCache());
-      updateToken(null);
+      updateTokens(null, null, null);
+
+      localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('role');
 
@@ -21,7 +19,7 @@ export const SignOut: React.FC = () => {
     };
 
     signOut();
-  }, [navigate, updateToken]);
+  }, [navigate, updateTokens]);
 
   return <div></div>;
 };

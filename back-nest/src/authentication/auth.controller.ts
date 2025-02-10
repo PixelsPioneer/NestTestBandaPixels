@@ -16,6 +16,7 @@ import { AuthService } from './auth.service';
 import { SignUpDto } from '../dto/signup.dto';
 import { SignInDto } from '../dto/signIn.dto';
 import { UserDto } from '../dto/user.dto';
+import { RefreshTokenDto } from '../dto/refreshToken.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -35,7 +36,8 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refresh(@Body() body: { refresh_token: string }) {
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async refresh(@Body() body: RefreshTokenDto) {
     return this.authService.refreshToken(body.refresh_token);
   }
 

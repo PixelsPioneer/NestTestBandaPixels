@@ -1,35 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import Modal from 'react-modal';
 
 import styles from './authModal.module.css';
-import { SignInForm } from './signInModal';
-import { SignUpForm } from './signUpModal';
 
 Modal.setAppElement('#root');
 
+const SignInForm = React.lazy(() => import('./signInModal').then(module => ({ default: module.default })));
+const SignUpForm = React.lazy(() => import('./signUpModal').then(module => ({ default: module.default })));
+
 interface AuthModalProps {
-  isOpen: boolean;
-  onClose: () => void;
   isSignIn: boolean;
+  isOpen: boolean;
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, isSignIn }) => {
+export const AuthModal: React.FC<AuthModalProps> = ({ isSignIn, isOpen }) => {
   const [activeTab, setActiveTab] = useState(isSignIn);
 
   useEffect(() => {
     setActiveTab(isSignIn);
   }, [isSignIn]);
 
-  const handleModalClose = () => {
-    onClose();
-  };
-
   return (
-    <Modal isOpen={isOpen} onRequestClose={handleModalClose} className={styles.modalOverlay}>
+    <Modal isOpen={isOpen} className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        <button className={styles.closeButton} onClick={handleModalClose}>
-          &times;
-        </button>
         <div className={styles.toggleButtons}>
           <button
             onClick={() => setActiveTab(true)}
@@ -42,7 +35,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, isSignIn 
             Sign Up
           </button>
         </div>
-        {activeTab ? <SignInForm onClose={handleModalClose} /> : <SignUpForm onClose={handleModalClose} />}
+
+        <Suspense fallback={<div>Loading...</div>}>{activeTab ? <SignInForm /> : <SignUpForm />}</Suspense>
       </div>
     </Modal>
   );

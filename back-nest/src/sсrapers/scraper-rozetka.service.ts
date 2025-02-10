@@ -123,15 +123,15 @@ export class ScraperRozetkaService {
         });
       const type = 'Computer';
 
-      const profileImage: string[] = [];
+      const profileImages: string[] = [];
 
       $(element)
         .find('.goods-tile__picture img')
         .each((_, imgElement) => {
           const imageUrl =
             $(imgElement).attr('src') || $(imgElement).attr('data-src');
-          if (imageUrl && !profileImage.includes(imageUrl)) {
-            profileImage.push(imageUrl);
+          if (imageUrl && !profileImages.includes(imageUrl)) {
+            profileImages.push(imageUrl);
           }
         });
 
@@ -146,7 +146,7 @@ export class ScraperRozetkaService {
         }
       }
 
-      if (title && profileImage.length > 0 && price) {
+      if (title && profileImages.length > 0 && price) {
         const productData: ScrapedProduct = {
           title,
           subtitle,
@@ -155,7 +155,7 @@ export class ScraperRozetkaService {
           newPrice: hasDiscount ? parseFloat(currentPrice) : null,
           specifications: JSON.stringify(specifications),
           type,
-          profileImage,
+          profileImages,
           hasDiscount,
           rating,
           source: Sources.Rozetka,

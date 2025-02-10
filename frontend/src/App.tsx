@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useState } from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -17,20 +18,17 @@ import { TokenProvider, useTokenContext } from './tokenContext/TokenContext';
 
 function AppContent() {
   const { theme, toggleTheme } = useTheme();
-  const { token } = useTokenContext();
-  const [isAuthModalOpen, setIsAuthModalOpen] = React.useState(false);
-  const [isSignIn, setIsSignIn] = React.useState(true);
+  const { accessToken } = useTokenContext();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(!accessToken);
+  const [isSignIn, setIsSignIn] = useState(true);
 
   useEffect(() => {
-    if (!token) {
-      setIsAuthModalOpen(true);
-    }
-  }, [token]);
-
-  const closeAuthModal = () => setIsAuthModalOpen(false);
+    setIsAuthModalOpen(!accessToken);
+  }, [accessToken]);
 
   return (
     <div className={`App ${theme}`}>
+      <AuthModal isOpen={isAuthModalOpen} isSignIn={isSignIn} />
       <Header
         toggleTheme={toggleTheme}
         theme={theme}
@@ -46,7 +44,6 @@ function AppContent() {
         <Route path="/signout" element={<SignOut />} />
       </Routes>
       <ToastContainer limit={3} />
-      <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} isSignIn={isSignIn} />
     </div>
   );
 }

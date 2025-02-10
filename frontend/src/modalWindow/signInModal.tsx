@@ -9,15 +9,12 @@ import { toastError, toastSuccess } from '../notification/ToastNotification.comp
 import { useTokenContext } from '../tokenContext/TokenContext';
 import styles from './signin.module.css';
 
-interface SignInFormProps {
-  onClose: () => void;
-}
+interface SignInFormProps {}
 
-export const SignInForm: React.FC<SignInFormProps> = ({ onClose }) => {
-  const { updateToken } = useTokenContext();
+export const SignInForm: React.FC<SignInFormProps> = ({}) => {
+  const { updateTokens } = useTokenContext();
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const signInMutation = useMutation({
@@ -35,18 +32,15 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onClose }) => {
       };
     },
     onSuccess: data => {
-      updateToken(data.access_token);
-      localStorage.setItem('refresh_token', data.refresh_token);
-      localStorage.setItem('role', data.role);
+      updateTokens(data.access_token, data.refresh_token, data.role);
       toastSuccess('Sign-In successful!');
-      onClose();
       navigate('/');
     },
     onError: (error: any) => {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         toastError('Invalid login or password');
       } else {
-        toastError('Error pls try again');
+        toastError('Error, please try again');
       }
     },
   });
