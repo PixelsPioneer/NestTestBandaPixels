@@ -5,14 +5,21 @@ import { useTokenContext } from '../tokenContext/TokenContext';
 
 export const SignOut: React.FC = () => {
   const navigate = useNavigate();
-  const { updateToken } = useTokenContext();
+  const { updateTokens } = useTokenContext();
 
   useEffect(() => {
-    updateToken(null);
-    localStorage.removeItem('role');
+    const signOut = async () => {
+      updateTokens(null, null, null);
 
-    navigate('/signin');
-  }, []);
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('role');
+
+      navigate('/');
+    };
+
+    signOut();
+  }, [navigate, updateTokens]);
 
   return <div></div>;
 };

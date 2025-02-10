@@ -45,7 +45,7 @@ export class ScraperRozetkaService {
         window.scrollBy(0, distance);
         scrolledHeight += distance;
 
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        await new Promise((resolve) => setTimeout(resolve, 900));
 
         const newScrollHeight = document.body.scrollHeight;
 
@@ -123,9 +123,17 @@ export class ScraperRozetkaService {
         });
       const type = 'Computer';
 
-      const profileImage = $(element)
+      const profileImages: string[] = [];
+
+      $(element)
         .find('.goods-tile__picture img')
-        .attr('src');
+        .each((_, imgElement) => {
+          const imageUrl =
+            $(imgElement).attr('src') || $(imgElement).attr('data-src');
+          if (imageUrl && !profileImages.includes(imageUrl)) {
+            profileImages.push(imageUrl);
+          }
+        });
 
       const ratingStyle = $(element).find('.stars__rating').attr('style');
 
@@ -138,7 +146,7 @@ export class ScraperRozetkaService {
         }
       }
 
-      if (title && profileImage && price) {
+      if (title && profileImages && price) {
         const productData: ScrapedProduct = {
           title,
           subtitle,
@@ -147,7 +155,7 @@ export class ScraperRozetkaService {
           newPrice: hasDiscount ? parseFloat(currentPrice) : null,
           specifications: JSON.stringify(specifications),
           type,
-          profileImage,
+          profileImages,
           hasDiscount,
           rating,
           source: Sources.Rozetka,

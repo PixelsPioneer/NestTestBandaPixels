@@ -26,7 +26,13 @@ export class ScraperTelemartService {
 
     await page.evaluate(() => {
       const images = document.querySelectorAll('img[loading="lazy"]');
-      images.forEach((img) => img.setAttribute('loading', 'eager'));
+      images.forEach((img) => {
+        if (img instanceof HTMLImageElement) {
+          if (img.dataset.src) {
+            img.src = img.dataset.src;
+          }
+        }
+      });
     });
 
     this.logger.log(`Navigating to ${url}...`);
@@ -35,6 +41,7 @@ export class ScraperTelemartService {
     await page.waitForSelector('.product-item__inner', { timeout: 30000 });
 
     this.logger.log('Extracting product data...');
+
     const rawProducts: ScrapedProduct[] = await page.evaluate((source) => {
       const items = Array.from(
         document.querySelectorAll('.product-item__inner'),
@@ -76,10 +83,29 @@ export class ScraperTelemartService {
 
         const type = element.getAttribute('data-prod-type') || 'Unknown type';
 
-        const profileImage =
-          element
-            .querySelector('.swiper-slide.swiper-slide-active img')
-            ?.getAttribute('src') || 'No image available';
+        const carouseActive = Array.from(
+          element.querySelectorAll('.swiper-slide img'),
+        )
+          .map((img) => img.getAttribute('src')?.trim())
+          .filter((src): src is string => !!src);
+
+        const carouselImages = Array.from(
+          element.querySelectorAll('.swiper-slide-next img'),
+        )
+          .map((img) => img.getAttribute('data-src')?.trim())
+          .filter((dataSrc): dataSrc is string => !!dataSrc);
+
+        const carouseLazy = Array.from(
+          element.querySelectorAll('.swiper-slide img'),
+        )
+          .map((img) => img.getAttribute('data-src')?.trim())
+          .filter((dataSrc): dataSrc is string => !!dataSrc);
+
+        const profileImages = [
+          ...carouseActive,
+          ...carouselImages,
+          ...carouseLazy,
+        ];
 
         const footerColumn = element.querySelector(
           '.product-item__footer-column',
@@ -124,7 +150,7 @@ export class ScraperTelemartService {
           newPrice: hasDiscount ? parsedNewPrice : null,
           specifications: JSON.stringify(specifications),
           type,
-          profileImage,
+          profileImages,
           hasDiscount,
           source,
           rating,

@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { product } from '@prisma/client';
+import { Product } from '@prisma/client';
 
 import { PrismaService } from '../../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
@@ -15,8 +15,8 @@ export class ProductService {
     private readonly redisService: RedisService,
   ) {}
 
-  async getAllProducts(): Promise<product[]> {
-    const cachedProducts = await this.redisService.get<product[]>(
+  async getAllProducts(): Promise<Product[]> {
+    const cachedProducts = await this.redisService.get<Product[]>(
       CacheKeys.PRODUCTS,
     );
     if (cachedProducts) {
@@ -36,7 +36,7 @@ export class ProductService {
     return products;
   }
 
-  async getProductById(id: number): Promise<product> {
+  async getProductById(id: number): Promise<Product> {
     return this.prisma.product.findUnique({
       where: { id },
     });

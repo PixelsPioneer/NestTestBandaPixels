@@ -1,8 +1,7 @@
 .container {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  height: auto;
+  margin-top: 10%;
   background-color: var(--background-color);
 }
 
@@ -14,14 +13,6 @@
   background-color: var(--signin-form);
   box-shadow: 0 4px 8px var(--shadow);
   border-radius: 8px;
-}
-
-.title {
-  text-align: center;
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 2rem;
-  margin-top: -0.5rem;
 }
 
 .inputGroup {
@@ -40,7 +31,7 @@
   background-color: var(--background-color);
   width: 94%;
   padding: 0.75rem;
-  border: 1px solid var(--text-color);
+  border: 1px solid var(--black);
   border-radius: 5px;
   font-size: 1rem;
   color: var(--text-color);
@@ -54,18 +45,19 @@
 
 .submitButton {
   width: 100%;
-  padding: 0.75rem;
-  margin-top: 3rem;
+  padding: 1.4rem;
+  margin-top: 2rem;
   background-color: var(--confirm-color);
   color: var(--text-color);
   font-size: 1.2rem;
-  font-weight: 600;
+  font-weight: bold;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .submitButton:hover {
   background-color: var(--confirm-color-hover);
+  transform: scale(1.02);
 }

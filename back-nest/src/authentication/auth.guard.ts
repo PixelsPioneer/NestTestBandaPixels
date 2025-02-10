@@ -11,7 +11,7 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { Role } from '@prisma/client';
 
-import { jwtConstants } from './constants';
+import { jwtConfig } from './constants';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -25,7 +25,7 @@ export class AuthGuard implements CanActivate {
     }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: jwtConstants.accessToken,
+        secret: jwtConfig.accessToken,
       });
       request['user'] = payload;
     } catch {

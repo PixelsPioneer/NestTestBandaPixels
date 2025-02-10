@@ -3,6 +3,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
+  margin: -8px -8px;
   background-color: var(--header-background-color);
 }
 
@@ -62,21 +63,19 @@
 .label {
   flex: 1;
   text-align: center;
-  z-index: 2;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 600;
   color: var(--text-color);
 }
 
 .slider {
   position: absolute;
-  top: 4px;
-  left: 4px;
-  width: 44px;
-  height: 32px;
+  top: 2px;
+  left: 6px;
+  width: 36px;
+  height: 36px;
   background-color: var(--text-color);
   border-radius: 50%;
-  z-index: 1;
   transition: transform 0.3s ease;
 }
 
@@ -89,7 +88,7 @@
 }
 
 .theme-toggle:hover {
-  background-color: #3fc828;
+  background: none;
 }
 
 .dark-theme {
@@ -104,4 +103,23 @@
 
 .theme-toggle.dark .theme-toggle-slider {
   transform: translateX(25px);
+}
+
+.AuthButton , .signOutButton , .productButton {
+  width: 90px;
+  height: 35px;
+  border: 1px solid var(--text-color);
+  background: none;
+  color: var(--text-color);
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 20px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+
+.AuthButton:hover , .signOutButton:hover , .productButton:hover {
+  background-color: var(--hover-button);
+  color: var(--hover-button-text);
+  transform: scale(1.1);
 }

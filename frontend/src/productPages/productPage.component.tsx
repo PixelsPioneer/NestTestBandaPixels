@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import Slider from 'react-slick';
 
 import axios from 'axios';
+import 'slick-carousel/slick/slick.css';
 
 import { apiEndpoints } from '../constants/constants';
 import { Element } from '../interfaces/Element.component';
 import { toastError } from '../notification/ToastNotification.component';
 import styles from '../productPages/productpage.module.css';
 import { RatingStars } from '../ratingProduct/Rating.Component';
+import '../slick/slick-theme.css';
 
 export const ProductPage: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
@@ -56,10 +59,34 @@ export const ProductPage: React.FC = () => {
     return <div className={styles.productNotFound}>Product was not found</div>;
   }
 
+  const carouselSettings = {
+    dots: true,
+    infinite: false,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 4000,
+    pauseOnHover: true,
+    centerMode: true,
+    centerPadding: '0px',
+    adaptiveHeight: true,
+  };
+
   return (
     <div className={styles.productContainer}>
       <div className={styles.productContainerImage}>
-        <img className={styles.productImage} src={product.profileImage} alt={product.title || 'No title available'} />
+        <Slider {...carouselSettings} className={styles.carousel}>
+          {Array.isArray(product.profileImages) &&
+            product.profileImages.map((imageUrl, index) => (
+              <img
+                key={index}
+                className={styles.productImage}
+                src={imageUrl}
+                alt={product.title || 'No title available'}
+              />
+            ))}
+        </Slider>
       </div>
       <div className={styles.detailProductContainer}>
         <div className={styles.productDetailsContainer}>

@@ -1,21 +1,18 @@
 import type { FC, PropsWithChildren } from 'react';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { UserRoles } from '../constants/constants';
-import { useToken } from '../hooks/useToken';
+import { useTokenContext } from '../tokenContext/TokenContext';
 
 interface AuthGuardProps extends PropsWithChildren {
   roles?: string[];
 }
 
 const AuthGuard: FC<AuthGuardProps> = ({ children, roles = [] }) => {
-  const { token } = useToken();
-  const navigate = useNavigate();
+  const { accessToken } = useTokenContext();
   const userRole = localStorage.getItem('role');
 
-  if (!token) {
-    navigate('/signin');
+  if (!accessToken) {
     return null;
   }
 

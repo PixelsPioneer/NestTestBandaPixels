@@ -5,7 +5,7 @@ export interface ScrapedProduct {
   price: number;
   specifications: string;
   type: string;
-  profileImage: string | null;
+  profileImages: string[];
   source: string;
   newPrice: number | null;
   hasDiscount: boolean;

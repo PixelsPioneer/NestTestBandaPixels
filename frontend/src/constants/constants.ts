@@ -10,6 +10,7 @@ export const apiEndpoints = {
     signUp: `${backendUrl}/auth/signup`,
     signIn: `${backendUrl}/auth/login`,
     profile: `${backendUrl}/auth/profile`,
+    refresh: `${backendUrl}/auth/refresh`,
   },
 };
 
