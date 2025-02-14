@@ -19,9 +19,9 @@ body {
   --white2: #ededed;
   --black: #000000;
   --gold: #FFD700FF;
-  --dark-grey: #232222;
+  --dark-grey: rgb(35, 34, 34);
   --grey: #ccc;
-  --header-grey: #777575;
+  --header-grey: #cac3c3;
   --shadow: #0000007f;
   --form: #3c3c3c;
   --white-shadow: #ffffffbd;
@@ -54,6 +54,8 @@ body {
   --carousel-color: var(--black);
   --hover-button: var(--white2);
   --hover-button-text: var(--black);
+  --cart-color: var(--white);
+  --cart-color-hover: var(--confirm-color);
 }
 
 .light-theme {
@@ -75,4 +77,6 @@ body {
   --carousel-color: var(--grey);
   --hover-button: var(--black);
   --hover-button-text: var(--white);
+  --cart-color: var(--black);
+  --cart-color-hover: var(--confirm-color);
 }
