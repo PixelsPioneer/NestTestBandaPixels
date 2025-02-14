@@ -2,7 +2,7 @@ import type { FC, PropsWithChildren } from 'react';
 import React from 'react';
 
 import { UserRoles } from '../constants/constants';
-import { useTokenContext } from '../tokenContext/TokenContext';
+import { useTokenContext } from '../context/TokenContext';
 
 interface AuthGuardProps extends PropsWithChildren {
   roles?: string[];
