@@ -4,9 +4,9 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 
 import { apiEndpoints } from '../constants/constants';
+import { useTokenContext } from '../context/TokenContext';
 import type { Element } from '../interfaces/Element.component';
 import { toastError, toastSuccess } from '../notification/ToastNotification.component';
-import { useTokenContext } from '../tokenContext/TokenContext';
 import { ProductCard } from './ProductCard.component';
 import styles from './product-list.module.css';
 
