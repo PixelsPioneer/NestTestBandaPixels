@@ -4,6 +4,8 @@ import { DeleteSweep, ShoppingCart } from '@mui/icons-material';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { Avatar, Badge, Divider, IconButton, List, ListItem, ListItemText, Popover, Typography } from '@mui/material';
 
+import styles from './cartIconWithDropDown.module.css';
+
 const CartIconWithDropdown = () => {
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -85,16 +87,9 @@ const CartIconWithDropdown = () => {
 
   return (
     <div>
-      <IconButton
-        onClick={handleClick}
-        sx={{
-          position: 'relative',
-          color: 'var(--cart-color)',
-          padding: '8px',
-          '&:hover': { color: 'var(--cart-color-hover)' },
-        }}>
+      <IconButton onClick={handleClick}>
         <Badge badgeContent={totalQuantity} color="error">
-          <ShoppingCart sx={{ fontSize: '28px' }} />
+          <ShoppingCart className={styles.cartIcon} />
         </Badge>
       </IconButton>
 
@@ -104,35 +99,21 @@ const CartIconWithDropdown = () => {
         onClose={handleClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         transformOrigin={{ vertical: 'top', horizontal: 'center' }}>
-        <List sx={{ width: '450px', padding: '10px' }}>
+        <List className={styles.prooverList}>
           {cartItems.length > 0 ? (
             cartItems.map((item: any) => (
               <div key={item.id}>
-                <ListItem
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '10px 0',
-                  }}>
-                  <Avatar src={item.image} alt={item.title} sx={{ marginRight: '10px', width: 40, height: 40 }} />
+                <ListItem className={styles.listItem}>
+                  <Avatar src={item.image} alt={item.title} className={styles.avatar} />
                   <ListItemText
                     primary={item.title}
                     secondary={`Price: ${item.price} x ${item.quantity} = ${item.totalPrice}`}
                   />
                   <IconButton onClick={() => handleQuantityChange(item.id, item.quantity - 1)}>-</IconButton>
-                  <Typography sx={{ margin: '0 10px', fontWeight: 'bold' }}>{item.quantity}</Typography>
+                  <Typography className={styles.numberProduct}>{item.quantity}</Typography>
                   <IconButton onClick={() => handleQuantityChange(item.id, item.quantity + 1)}>+</IconButton>
-                  <IconButton
-                    onClick={() => handleRemoveItem(item.id)}
-                    sx={{ backgroundColor: 'none', '&:hover': { background: 'none' } }}>
-                    <CloseOutlinedIcon
-                      sx={{
-                        fontSize: '20px',
-                        color: 'var(--cancel-color)',
-                        position: 'relative',
-                        top: '-40px',
-                      }}
-                    />
+                  <IconButton onClick={() => handleRemoveItem(item.id)}>
+                    <CloseOutlinedIcon className={styles.closeIcon} />
                   </IconButton>
                 </ListItem>
                 <Divider />
@@ -144,14 +125,16 @@ const CartIconWithDropdown = () => {
             </ListItem>
           )}
 
-          <ListItem sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <ListItem className={styles.listItemTotal}>
             <Typography variant="h6">Total Price</Typography>
-            <Typography variant="h6">{totalPrice} UAH</Typography>
+            <Typography variant="h6" className={styles.totalPriceValue}>
+              {totalPrice} UAH
+            </Typography>
           </ListItem>
 
           <ListItem>
-            <IconButton onClick={handleClearCart} sx={{ color: 'red' }}>
-              <DeleteSweep sx={{ fontSize: '28px' }} />
+            <IconButton onClick={handleClearCart}>
+              <DeleteSweep className={styles.clearCartIcon} />
             </IconButton>
             <ListItemText primary="Clear All" />
           </ListItem>
