@@ -82,12 +82,12 @@ export class AuthService {
   async generateAuthTokens(userId: number, role: Role = Role.user) {
     const accessToken = await this.jwtService.signAsync(
       { sub: userId, role, type: tokenTypes.access },
-      { expiresIn: '20s' },
+      { expiresIn: '1d' },
     );
 
     const refreshToken = await this.jwtService.signAsync(
       { sub: userId, role, type: tokenTypes.refresh },
-      { secret: jwtConfig.refreshToken, expiresIn: '2m' },
+      { secret: jwtConfig.refreshToken, expiresIn: '7d' },
     );
 
     return { accessToken, refreshToken };

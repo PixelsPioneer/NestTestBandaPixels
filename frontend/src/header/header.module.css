@@ -12,6 +12,13 @@
   font-weight: bold;
 }
 
+.cartContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 2%;
+}
+
 .nav {
   margin-left: auto;
   margin-right: 5%;

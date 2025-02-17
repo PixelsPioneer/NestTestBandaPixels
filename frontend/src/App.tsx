@@ -8,13 +8,14 @@ import 'slick-carousel/slick/slick-theme.css';
 import 'slick-carousel/slick/slick.css';
 
 import './App.css';
+import { TokenProvider, useTokenContext } from './context/TokenContext';
+import { CartProvider } from './context/cartContext';
 import { Header } from './header/Header.component';
 import { useTheme } from './hooks/useTheme';
 import { AuthModal } from './modalWindow/AuthModal';
 import { ProductsComponent } from './product/Products.component';
 import { ProductPage } from './productPages/productPage.component';
 import { SignOut } from './signOut/SignOut.component';
-import { TokenProvider, useTokenContext } from './tokenContext/TokenContext';
 
 function AppContent() {
   const { theme, toggleTheme } = useTheme();
@@ -51,9 +52,11 @@ function AppContent() {
 function App() {
   return (
     <TokenProvider>
-      <Router>
-        <AppContent />
-      </Router>
+      <CartProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </CartProvider>
     </TokenProvider>
   );
 }

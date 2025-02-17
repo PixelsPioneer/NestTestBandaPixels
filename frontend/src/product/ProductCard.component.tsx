@@ -7,13 +7,14 @@ import 'slick-carousel/slick/slick.css';
 import AuthGuard from '../authGuard/AuthGuard.component';
 import axiosInstance from '../axioInterceptors/TokenInterceptors';
 import { apiEndpoints } from '../constants/constants';
+import { useTokenContext } from '../context/TokenContext';
+import CartIcon from '../icons/cart-icon';
 import type { Element } from '../interfaces/Element.component';
 import { Modal } from '../modalWindow/Modal.component';
 import { toastError } from '../notification/ToastNotification.component';
 import { RatingStars } from '../ratingProduct/Rating.Component';
 import { Carousel } from '../slick/Carousel.component';
 import '../slick/slick-theme.css';
-import { useTokenContext } from '../tokenContext/TokenContext';
 import styles from './product-list.module.css';
 
 export interface CardProps {
@@ -44,6 +45,28 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
     } catch (error) {
       toastError('Error deleting product');
     }
+  };
+
+  const addToCart = () => {
+    const savedCart: Element[] = JSON.parse(localStorage.getItem('cart') || '[]');
+
+    const cartItem = {
+      id: element.id,
+      title: element.title,
+      price: element.hasDiscount ? element.newPrice : element.price,
+      image: element.profileImages?.[0] || '',
+      source: element.source,
+    };
+
+    const itemIndex = savedCart.findIndex(item => item.id === element.id);
+
+    let updatedCart;
+    if (itemIndex !== -1) {
+      updatedCart = savedCart.filter(item => item.id !== element.id);
+    } else {
+      updatedCart = [...savedCart, cartItem];
+    }
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
   };
 
   const goToProductPage = () => {
@@ -94,8 +117,15 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
             {element.hasDiscount && <p className={styles.oldPrice}>{element.price}₴</p>}
             <p className={styles.productPrice}>{element.hasDiscount ? element.newPrice : element.price}₴</p>
           </div>
-          <p className={styles.productSource}>Source: {element.source}</p>
-          <p className={styles.productType}>{element.type}</p>
+          <div className={styles.sourceContainer}>
+            <p className={styles.productSource}>Source: {element.source}</p>
+            <p className={styles.productType}>{element.type}</p>
+            <div className={styles.CartIconContainer}>
+              <button className={styles.cartButton} onClick={addToCart}>
+                <CartIcon id={element.id} />
+              </button>
+            </div>
+          </div>
         </div>
       </li>
 

@@ -1,0 +1,18 @@
+.cartButton {
+    color: var(--cart-color);
+    border: none;
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.cartButton:hover {
+    transform: scale(1.1);
+}
+
+.cartButton:active {
+    color: green;
+    transform: scale(0.95);
+}
+
+.activeCartButton {
+    color: green;
+}
