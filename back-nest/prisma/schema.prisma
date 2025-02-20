@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Product {
-  id             Int     @id @default(autoincrement())
+  product_id     Int     @id @default(autoincrement())
   title          String  @unique @db.VarChar(256)
   subtitle       String? @db.VarChar(256)
   description    String  @default("No description available") @db.VarChar(2048)
@@ -20,8 +20,19 @@ model Product {
   source         String  @db.VarChar(255)
   hasDiscount    Boolean @default(false)
   rating         Float?
+  Cart           Cart[]
 
   @@unique([title, source])
+}
+
+model Cart {
+  id         Int @id @default(autoincrement())
+  product_id Int
+  quantity   Int
+  user_id    Int
+
+  product Product @relation(fields: [product_id], references: [product_id])
+  usre    User    @relation(fields: [user_id], references: [user_id])
 }
 
 model User {
@@ -29,6 +40,7 @@ model User {
   login    String @unique @db.VarChar(50)
   password String @db.VarChar(256)
   role     Role
+  Cart     Cart[]
 }
 
 enum Role {
