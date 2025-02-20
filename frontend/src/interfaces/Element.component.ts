@@ -1,5 +1,5 @@
 export interface Element {
-  id: number;
+  product_id: number;
   title: string | null;
   subtitle: string | null;
   description: string | null;

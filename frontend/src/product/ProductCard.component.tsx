@@ -48,34 +48,45 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
   };
 
   const addToCart = () => {
-    const savedCart: Element[] = JSON.parse(localStorage.getItem('cart') || '[]');
+    const savedCart: any[] = JSON.parse(localStorage.getItem('cart') || '[]');
 
     const cartItem = {
-      id: element.id,
+      id: element.product_id,
       title: element.title,
       price: element.hasDiscount ? element.newPrice : element.price,
-      image: element.profileImages?.[0] || '',
+      newPrice: element.newPrice,
+      type: element.type,
+      profileImages: element.profileImages[0],
       source: element.source,
+      rating: element.rating,
+      quantity: 1,
     };
 
-    const itemIndex = savedCart.findIndex(item => item.id === element.id);
+    const itemIndex = savedCart.findIndex(item => item.id === element.product_id);
 
     let updatedCart;
     if (itemIndex !== -1) {
-      updatedCart = savedCart.filter(item => item.id !== element.id);
+      updatedCart = savedCart.filter(item => item.id !== element.product_id);
     } else {
       updatedCart = [...savedCart, cartItem];
     }
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
+
+    if (updatedCart.length === 0) {
+      localStorage.removeItem('cart');
+    } else {
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
+    }
+
+    window.dispatchEvent(new Event('cartUpdated'));
   };
 
   const goToProductPage = () => {
-    navigate(`/product/${element.id}`);
+    navigate(`/product/${element.product_id}`);
   };
 
   return (
     <>
-      <li className={styles.card} key={element.id}>
+      <li className={styles.card} key={element.product_id}>
         <AuthGuard>
           {
             <div className={styles.closeButtonContainer}>
@@ -122,7 +133,7 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
             <p className={styles.productType}>{element.type}</p>
             <div className={styles.CartIconContainer}>
               <button className={styles.cartButton} onClick={addToCart}>
-                <CartIcon id={element.id} />
+                <CartIcon id={element.product_id} />
               </button>
             </div>
           </div>
@@ -132,7 +143,7 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
       <Modal
         isVisible={isModalVisible}
         onClose={() => setModalVisible(false)}
-        onConfirm={() => handleDelete(element.id)}
+        onConfirm={() => handleDelete(element.product_id)}
         title="Are you sure you want to delete this product?"></Modal>
     </>
   );

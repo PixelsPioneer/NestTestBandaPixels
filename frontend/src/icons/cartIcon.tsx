@@ -1,25 +1,50 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { DeleteSweep, ShoppingCart } from '@mui/icons-material';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { Avatar, Badge, Divider, IconButton, List, ListItem, ListItemText, Popover, Typography } from '@mui/material';
+import debounce from 'lodash.debounce';
 
+import axiosInstance from '../axioInterceptors/TokenInterceptors';
+import { apiEndpoints } from '../constants/constants';
 import styles from './cartIconWithDropDown.module.css';
 
 const CartIconWithDropdown = () => {
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const fetchCart = () => {
-    const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const user_id = localStorage.getItem('user_id');
 
-    const updatedCart = savedCart.map((item: any) => ({
-      ...item,
-      quantity: item.quantity || 1,
-      totalPrice: item.totalPrice || item.price,
-    }));
+  const fetchCart = async () => {
+    try {
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) {
+        console.error('Access token not found');
+        return;
+      }
 
-    setCartItems(updatedCart);
+      const cartResponse = await axiosInstance.get(apiEndpoints.carts.cart, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const cartData = cartResponse.data || [];
+      const updatedCart = cartData.map((item: any) => ({
+        id: item.product_id,
+        title: item.product.title,
+        price: item.product.hasDiscount ? item.product.newPrice : item.product.price,
+        newPrice: item.product.newPrice,
+        type: item.product.type,
+        profileImages: item.product.profileImages[0],
+        source: item.product.source,
+        rating: item.product.rating,
+        quantity: item.quantity || 1,
+        totalPrice: item.totalPrice || item.product.price * (item.quantity || 1),
+      }));
+
+      setCartItems(updatedCart);
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
+    } catch (error) {
+      console.error('Error fetching cart:', error);
+    }
   };
 
   useEffect(() => {
@@ -29,46 +54,81 @@ const CartIconWithDropdown = () => {
   useEffect(() => {
     const handleStorageChange = () => fetchCart();
     window.addEventListener('storage', handleStorageChange);
-
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchCart();
-    });
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+  }, [cartItems]);
 
-    return () => clearInterval(interval);
+  const debouncedUpdateCartInSQL = useCallback(
+    debounce(async (cart: any[]) => {
+      if (!user_id) return;
+
+      const payload = {
+        cartItems: cart.map(item => ({ id: item.id, quantity: item.quantity })),
+        user_id,
+      };
+
+      try {
+        const response = await axiosInstance.post(apiEndpoints.carts.update, payload);
+        if (response.status === 200) {
+          console.log('SQL Cart table updated:', response.data);
+        } else {
+          console.error('Bad Request');
+        }
+      } catch (error) {
+        console.error('Error updating SQL Cart table:', error);
+      }
+    }, 1000),
+    [user_id],
+  );
+
+  useEffect(() => {
+    const syncCartFromLocalStorage = () => {
+      const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+      setCartItems(storedCart);
+    };
+
+    syncCartFromLocalStorage();
+
+    window.addEventListener('cartUpdated', syncCartFromLocalStorage);
+
+    return () => {
+      window.removeEventListener('cartUpdated', syncCartFromLocalStorage);
+    };
   }, []);
+
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      debouncedUpdateCartInSQL(cartItems);
+    }
+  }, [cartItems, debouncedUpdateCartInSQL]);
 
   const handleQuantityChange = (id: string, newQuantity: number) => {
     if (newQuantity <= 0) return;
-
-    const updatedCart = cartItems.map(item =>
-      item.id === id ? { ...item, quantity: newQuantity, totalPrice: item.price * newQuantity } : item,
+    setCartItems(prevCart =>
+      prevCart.map(item =>
+        item.id === id ? { ...item, quantity: newQuantity, totalPrice: item.price * newQuantity } : item,
+      ),
     );
-
-    setCartItems(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-    window.dispatchEvent(new Event('storage'));
   };
 
   const handleRemoveItem = (id: string) => {
-    const updatedCart = cartItems.filter(item => item.id !== id);
-    setCartItems(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-
-    const isActive = JSON.parse(localStorage.getItem('isActive') || '[]');
-    const updatedIsActive = isActive.filter((itemId: number) => itemId !== Number(id));
-    localStorage.setItem('isActive', JSON.stringify(updatedIsActive));
+    setCartItems(prevCart => {
+      const updatedCart = prevCart.filter(item => item.id !== id);
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
+      debouncedUpdateCartInSQL(updatedCart);
+      return updatedCart;
+    });
   };
 
   const handleClearCart = () => {
     setCartItems([]);
-    localStorage.setItem('cart', JSON.stringify([]));
-    window.dispatchEvent(new Event('storage'));
+    localStorage.removeItem('cart');
+    debouncedUpdateCartInSQL([]);
   };
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -80,9 +140,7 @@ const CartIconWithDropdown = () => {
   };
 
   const open = Boolean(anchorEl);
-
   const totalPrice = cartItems.reduce((total, item) => total + item.totalPrice, 0);
-
   const totalQuantity = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
@@ -104,7 +162,7 @@ const CartIconWithDropdown = () => {
             cartItems.map((item: any) => (
               <div key={item.id}>
                 <ListItem className={styles.listItem}>
-                  <Avatar src={item.image} alt={item.title} className={styles.avatar} />
+                  <Avatar src={item.profileImages} alt={item.title} className={styles.avatar} />
                   <ListItemText
                     primary={item.title}
                     secondary={`Price: ${item.price} x ${item.quantity} = ${item.totalPrice}`}
