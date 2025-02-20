@@ -11,9 +11,7 @@ export const SignOut: React.FC = () => {
     const signOut = async () => {
       updateTokens(null, null, null);
 
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('role');
+      localStorage.clear();
 
       navigate('/');
     };
