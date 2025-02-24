@@ -7,17 +7,18 @@ import debounce from 'lodash.debounce';
 
 import axiosInstance from '../axioInterceptors/TokenInterceptors';
 import { apiEndpoints } from '../constants/constants';
+import useToken from '../utils/useToken';
 import styles from './cartIconWithDropDown.module.css';
 
 const CartIconWithDropdown = () => {
   const [cartItems, setCartItems] = useState<any[]>([]);
+  const accessToken = useToken();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const user_id = localStorage.getItem('user_id');
 
   const fetchCart = async () => {
     try {
-      const accessToken = localStorage.getItem('access_token');
       if (!accessToken) {
         console.error('Access token not found');
         return;
@@ -49,7 +50,7 @@ const CartIconWithDropdown = () => {
 
   useEffect(() => {
     fetchCart();
-  }, []);
+  }, [accessToken]);
 
   useEffect(() => {
     const handleStorageChange = () => fetchCart();
@@ -94,10 +95,11 @@ const CartIconWithDropdown = () => {
 
     syncCartFromLocalStorage();
 
-    window.addEventListener('cartUpdated', syncCartFromLocalStorage);
+    const cartUpdatedHandler = () => syncCartFromLocalStorage();
+    window.addEventListener('cartUpdated', cartUpdatedHandler);
 
     return () => {
-      window.removeEventListener('cartUpdated', syncCartFromLocalStorage);
+      window.removeEventListener('cartUpdated', cartUpdatedHandler);
     };
   }, []);
 
