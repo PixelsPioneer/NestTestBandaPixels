@@ -1,6 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 
 import { PrismaService } from '../../prisma/prisma.service';
+import { UpdateCartParams } from './model/updateCartParams.model';
 
 @Injectable()
 export class CartService {
@@ -9,15 +10,14 @@ export class CartService {
   constructor(private prisma: PrismaService) {}
 
   async getUserCart(user_id: number) {
-    this.logger.log(`Fetching cart for user: ${user_id}`);
-
     if (!user_id) {
-      this.logger.error('User ID is undefined!');
-      return [];
+      throw new UnauthorizedException('Unauthorized');
     }
 
+    this.logger.log(`Fetching cart for user: ${user_id}`);
+
     const cart = await this.prisma.cart.findMany({
-      where: { user_id: Number(user_id) },
+      where: { user_id },
       include: { product: true },
     });
 
@@ -25,10 +25,7 @@ export class CartService {
     return cart;
   }
 
-  async updateCart(
-    user_id: number,
-    cartItems: { id: number; quantity: number }[],
-  ) {
+  async updateCart({ user_id, cartItems }: UpdateCartParams) {
     this.logger.log(`Deleting cart items for user_id=${user_id}`);
 
     await this.prisma.cart.deleteMany({ where: { user_id } });
@@ -40,7 +37,7 @@ export class CartService {
       `Cart after deleteMany: ${JSON.stringify(remainingItems)}`,
     );
 
-    if (cartItems.length === 0) {
+    if (!cartItems.length) {
       this.logger.log('Cart is now empty in the database.');
       return;
     }

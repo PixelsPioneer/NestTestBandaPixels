@@ -3,13 +3,16 @@ import {
   Get,
   Post,
   Body,
-  Req,
   UseGuards,
   Logger,
+  ValidationPipe,
 } from '@nestjs/common';
 
 import { CartService } from './cart.service';
 import { AuthGuard } from '../authentication/auth.guard';
+import { User } from '../decorators/user.decorator';
+import { UserDto } from '../dto/user.dto';
+import { UpdateCartDto } from '../dto/updateCart.dto';
 
 @Controller('cart')
 export class CartController {
@@ -19,27 +22,26 @@ export class CartController {
 
   @UseGuards(AuthGuard)
   @Get()
-  async getUserCart(@Req() req) {
-    const userId = req.user.sub;
-    return this.cartService.getUserCart(userId);
+  async getUserCart(@User() user: UserDto) {
+    return this.cartService.getUserCart(user.sub);
   }
 
   @UseGuards(AuthGuard)
   @Post('update')
   async updateCart(
-    @Req() req,
-    @Body() body: { cartItems: { id: number; quantity: number }[] },
+    @User() user,
+    @Body(new ValidationPipe()) body: UpdateCartDto,
   ) {
-    this.logger.debug(`Received request body: ${JSON.stringify(body)}`);
+    this.logger.debug(
+      `Received validated request body: ${JSON.stringify(body)}`,
+    );
 
-    if (!Array.isArray(body.cartItems)) {
-      this.logger.error('cartItems is not an array!');
-      return { message: 'Invalid cartItems format' };
-    }
+    const userId = user.sub;
 
-    const userId = req.user.sub;
-
-    await this.cartService.updateCart(userId, body.cartItems);
+    await this.cartService.updateCart({
+      user_id: userId,
+      cartItems: body.cartItems,
+    });
 
     return { message: 'Cart updated successfully' };
   }
