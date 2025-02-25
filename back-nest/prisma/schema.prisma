@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Product {
-  product_id     Int     @id @default(autoincrement())
+  id             Int     @id @default(autoincrement())
   title          String  @unique @db.VarChar(256)
   subtitle       String? @db.VarChar(256)
   description    String  @default("No description available") @db.VarChar(2048)
@@ -31,12 +31,12 @@ model Cart {
   quantity   Int
   user_id    Int
 
-  product Product @relation(fields: [product_id], references: [product_id])
-  user    User    @relation(fields: [user_id], references: [user_id])
+  product Product @relation(fields: [product_id], references: [id])
+  user    User    @relation(fields: [user_id], references: [id])
 }
 
 model User {
-  user_id  Int    @id @default(autoincrement())
+  id       Int    @id @default(autoincrement())
   login    String @unique @db.VarChar(50)
   password String @db.VarChar(256)
   role     Role
