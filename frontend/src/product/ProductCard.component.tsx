@@ -51,7 +51,7 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
     const savedCart: any[] = JSON.parse(localStorage.getItem('cart') || '[]');
 
     const cartItem = {
-      id: element.product_id,
+      id: element.id,
       title: element.title,
       price: element.hasDiscount ? element.newPrice : element.price,
       newPrice: element.newPrice,
@@ -62,11 +62,11 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
       quantity: 1,
     };
 
-    const itemIndex = savedCart.findIndex(item => item.id === element.product_id);
+    const itemIndex = savedCart.findIndex(item => item.id === element.id);
 
     let updatedCart;
     if (itemIndex !== -1) {
-      updatedCart = savedCart.filter(item => item.id !== element.product_id);
+      updatedCart = savedCart.filter(item => item.id !== element.id);
     } else {
       updatedCart = [...savedCart, cartItem];
     }
@@ -81,12 +81,12 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
   };
 
   const goToProductPage = () => {
-    navigate(`/product/${element.product_id}`);
+    navigate(`/product/${element.id}`);
   };
 
   return (
     <>
-      <li className={styles.card} key={element.product_id}>
+      <li className={styles.card} key={element.id}>
         <AuthGuard>
           {
             <div className={styles.closeButtonContainer}>
@@ -133,7 +133,7 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
             <p className={styles.productType}>{element.type}</p>
             <div className={styles.CartIconContainer}>
               <button className={styles.cartButton} onClick={addToCart}>
-                <CartIcon id={element.product_id} />
+                <CartIcon id={element.id} />
               </button>
             </div>
           </div>
@@ -143,7 +143,7 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
       <Modal
         isVisible={isModalVisible}
         onClose={() => setModalVisible(false)}
-        onConfirm={() => handleDelete(element.product_id)}
+        onConfirm={() => handleDelete(element.id)}
         title="Are you sure you want to delete this product?"></Modal>
     </>
   );

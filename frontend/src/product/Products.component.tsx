@@ -46,7 +46,7 @@ export const ProductsComponent: React.FC = () => {
   }, []);
 
   const handleDelete = (id: number) => {
-    setElements(prevElements => prevElements.filter(element => element.product_id !== id));
+    setElements(prevElements => prevElements.filter(element => element.id !== id));
     toastSuccess('Product deleted successfully !');
   };
 
@@ -62,7 +62,7 @@ export const ProductsComponent: React.FC = () => {
       ) : (
         <ul className={styles.cardContainer}>
           {elements.map(element => (
-            <ProductCard key={element.product_id} element={element} onDelete={() => handleDelete(element.product_id)} />
+            <ProductCard key={element.id} element={element} onDelete={() => handleDelete(element.id)} />
           ))}
         </ul>
       )}

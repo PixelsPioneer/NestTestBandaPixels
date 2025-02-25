@@ -29,7 +29,7 @@ const CartIconWithDropdown = () => {
       });
       const cartData = cartResponse.data || [];
       const updatedCart = cartData.map((item: any) => ({
-        id: item.product_id,
+        id: item.product.id,
         title: item.product.title,
         price: item.product.hasDiscount ? item.product.newPrice : item.product.price,
         newPrice: item.product.newPrice,
