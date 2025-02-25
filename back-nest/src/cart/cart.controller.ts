@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  UseGuards,
-  Logger,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Logger } from '@nestjs/common';
 
 import { CartService } from './cart.service';
 import { AuthGuard } from '../authentication/auth.guard';
@@ -28,18 +20,13 @@ export class CartController {
 
   @UseGuards(AuthGuard)
   @Post('update')
-  async updateCart(
-    @User() user,
-    @Body(new ValidationPipe()) body: UpdateCartDto,
-  ) {
+  async updateCart(@User() user, @Body() body: UpdateCartDto) {
     this.logger.debug(
       `Received validated request body: ${JSON.stringify(body)}`,
     );
 
-    const userId = user.sub;
-
     await this.cartService.updateCart({
-      user_id: userId,
+      userId: user.sub,
       cartItems: body.cartItems,
     });
 

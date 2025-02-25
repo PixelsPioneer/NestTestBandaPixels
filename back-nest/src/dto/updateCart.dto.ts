@@ -1,4 +1,5 @@
-import { IsArray, IsInt, IsNotEmpty } from 'class-validator';
+import { IsArray, IsInt, IsNotEmpty, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CartItemDto {
@@ -15,6 +16,8 @@ export class CartItemDto {
 
 export class UpdateCartDto {
   @IsArray()
-  @ApiProperty()
+  @ValidateNested({ each: true })
+  @Type(() => CartItemDto)
+  @ApiProperty({ type: [CartItemDto] })
   cartItems: CartItemDto[];
 }
