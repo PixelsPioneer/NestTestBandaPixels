@@ -12,6 +12,10 @@ export const apiEndpoints = {
     profile: `${backendUrl}/auth/profile`,
     refresh: `${backendUrl}/auth/refresh`,
   },
+  carts: {
+    cart: `${backendUrl}/cart`,
+    update: `${backendUrl}/cart/update`,
+  },
 };
 
 export enum Themes {

@@ -48,14 +48,18 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
   };
 
   const addToCart = () => {
-    const savedCart: Element[] = JSON.parse(localStorage.getItem('cart') || '[]');
+    const savedCart: any[] = JSON.parse(localStorage.getItem('cart') || '[]');
 
     const cartItem = {
       id: element.id,
       title: element.title,
       price: element.hasDiscount ? element.newPrice : element.price,
-      image: element.profileImages?.[0] || '',
+      newPrice: element.newPrice,
+      type: element.type,
+      profileImages: element.profileImages[0],
       source: element.source,
+      rating: element.rating,
+      quantity: 1,
     };
 
     const itemIndex = savedCart.findIndex(item => item.id === element.id);
@@ -66,7 +70,14 @@ export const ProductCard: FC<CardProps> = ({ element, onDelete }) => {
     } else {
       updatedCart = [...savedCart, cartItem];
     }
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
+
+    if (updatedCart.length === 0) {
+      localStorage.removeItem('cart');
+    } else {
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
+    }
+
+    window.dispatchEvent(new Event('cartUpdated'));
   };
 
   const goToProductPage = () => {

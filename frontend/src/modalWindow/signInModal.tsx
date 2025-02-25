@@ -29,10 +29,14 @@ export const SignInForm: React.FC<SignInFormProps> = ({}) => {
         access_token: response.data.access_token,
         refresh_token: response.data.refresh_token,
         role: profileResponse.data.role,
+        user_id: profileResponse.data.sub,
       };
     },
     onSuccess: data => {
       updateTokens(data.access_token, data.refresh_token, data.role);
+
+      localStorage.setItem('user_id', data.user_id);
+
       toastSuccess('Sign-In successful!');
       navigate('/');
     },

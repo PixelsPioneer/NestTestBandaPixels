@@ -28,7 +28,7 @@ export class AuthService {
     }
 
     const { accessToken, refreshToken } = await this.generateAuthTokens(
-      user.user_id,
+      user.id,
       user.role,
     );
 
@@ -51,7 +51,7 @@ export class AuthService {
       }
 
       const { accessToken, refreshToken } = await this.generateAuthTokens(
-        user.user_id,
+        user.id,
         user.role,
       );
 

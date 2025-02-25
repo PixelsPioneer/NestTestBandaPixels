@@ -20,15 +20,27 @@ model Product {
   source         String  @db.VarChar(255)
   hasDiscount    Boolean @default(false)
   rating         Float?
+  cart           Cart[]
 
   @@unique([title, source])
 }
 
+model Cart {
+  id         Int @id @default(autoincrement())
+  product_id Int
+  quantity   Int
+  user_id    Int
+
+  product Product @relation(fields: [product_id], references: [id])
+  user    User    @relation(fields: [user_id], references: [id])
+}
+
 model User {
-  user_id  Int    @id @default(autoincrement())
+  id       Int    @id @default(autoincrement())
   login    String @unique @db.VarChar(50)
   password String @db.VarChar(256)
   role     Role
+  cart     Cart[]
 }
 
 enum Role {
