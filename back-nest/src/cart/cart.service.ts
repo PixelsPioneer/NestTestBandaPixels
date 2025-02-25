@@ -1,4 +1,4 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { PrismaService } from '../../prisma/prisma.service';
 import { UpdateCartParams } from './model/updateCartParams.model';
@@ -10,12 +10,6 @@ export class CartService {
   constructor(private prisma: PrismaService) {}
 
   async getUserCart(user_id: number) {
-    if (!user_id) {
-      throw new UnauthorizedException('Unauthorized');
-    }
-
-    this.logger.log(`Fetching cart for user: ${user_id}`);
-
     const cart = await this.prisma.cart.findMany({
       where: { user_id },
       include: { product: true },
