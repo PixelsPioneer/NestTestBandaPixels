@@ -1,4 +1,11 @@
-import { Controller, Get, Delete, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Delete,
+  Param,
+  UseGuards,
+  NotFoundException,
+} from '@nestjs/common';
 import { Product } from '@prisma/client';
 
 import { ProductService } from './products.services';
@@ -15,7 +22,11 @@ export class ProductController {
 
   @Get(':id')
   async getProduct(@Param('id') id: string): Promise<Product> {
-    return this.productService.getProductById(Number(id));
+    const product = await this.productService.getProductById(Number(id));
+    if (!product) {
+      throw new NotFoundException(`Product with id ${id} not found`);
+    }
+    return product;
   }
 
   @UseGuards(AuthGuard, RolesGuard())

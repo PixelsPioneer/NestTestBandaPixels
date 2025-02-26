@@ -2,21 +2,44 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { PrismaService } from '../../prisma/prisma.service';
 import { UpdateCartParams } from './model/updateCartParams.model';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class CartService {
   private readonly logger = new Logger(CartService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private redisService: RedisService,
+  ) {}
 
   async getUserCart(userId: number) {
+    const cachedCart = await this.redisService.getCart(userId);
+
+    if (
+      cachedCart &&
+      cachedCart.items &&
+      Array.isArray(cachedCart.items) &&
+      cachedCart.items.length > 0
+    ) {
+      this.logger.debug(`Cache hit for user ${userId}`);
+      return cachedCart;
+    }
+
+    this.logger.debug(`Cache miss for user ${userId}, fetching from DB...`);
     const cart = await this.prisma.cart.findMany({
-      where: { user_id: userId }, // Using snake_case for database field
+      where: { user_id: userId },
       include: { product: true },
     });
 
-    this.logger.debug(`Cart for user ${userId}: ${JSON.stringify(cart)}`);
-    return cart;
+    if (!cart || !Array.isArray(cart)) {
+      this.logger.error(`Cart query returned invalid data for user ${userId}`);
+      return { items: [] };
+    }
+
+    await this.redisService.setCart(userId, { items: cart });
+
+    return { items: cart };
   }
 
   async updateCart({ userId, cartItems }: UpdateCartParams) {
@@ -33,6 +56,7 @@ export class CartService {
 
     if (!cartItems.length) {
       this.logger.log('Cart is now empty in the database.');
+      await this.redisService.clearCart(userId);
       return;
     }
 
@@ -53,5 +77,12 @@ export class CartService {
     });
 
     this.logger.log(`Successfully updated cart for userId=${userId}`);
+
+    const updateCart = await this.prisma.cart.findMany({
+      where: { user_id: userId },
+      include: { product: true },
+    });
+
+    await this.redisService.setCart(userId, { items: updateCart });
   }
 }
