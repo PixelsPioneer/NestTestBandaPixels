@@ -2,6 +2,7 @@ import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import Redis from 'ioredis';
 
+import { Cart } from '../cart/model/cart.model';
 import { CacheKeys } from './cache-keys.constant';
 
 @Injectable()
@@ -12,7 +13,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     this.redisClient = new Redis({
       host: process.env.REDIS_HOST,
-      port: parseInt(process.env.REDIS_PORT, 1) || 6379,
+      port: parseInt(process.env.REDIS_PORT ?? '6379', 10),
     });
 
     this.redisClient.on('connect', () => this.logger.log('Connected to Redis'));
@@ -21,9 +22,9 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     );
   }
 
-  async set(
+  async set<T>(
     key: string,
-    value: any,
+    value: T,
     expirationInSeconds?: number,
   ): Promise<void> {
     const serializedValue = JSON.stringify(value);
@@ -54,16 +55,16 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     this.logger.log(`Cache for the key ${CacheKeys.PRODUCTS} has been cleared`);
   }
 
-  async setCart(userId: number, cart: any): Promise<void> {
+  async setCart(userId: number, cart: Cart): Promise<void> {
     const key = `${CacheKeys.CARTS}:${userId}`;
-    await this.set(key, cart, 120);
+    await this.set<Cart>(key, cart, 120);
     this.logger.log(`Cart for user ${userId} has been cached`);
   }
 
-  async getCart(userId: number): Promise<any> {
+  async getCart(userId: number): Promise<Cart> {
     const key = `${CacheKeys.CARTS}:${userId}`;
-    const cart = await this.get<any>(key);
-    return cart || { items: [] };
+    const cart = await this.get<Cart>(key);
+    return cart ?? { items: [] };
   }
 
   async clearCart(userId: number): Promise<void> {
@@ -71,14 +72,6 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     await this.redisClient.del(key);
     this.logger.log(`Cart for user ${userId} has been cleared`);
   }
-
-  // async clearAllCarts(): Promise<void> {
-  //   const keys = await this.redisClient.keys(`${CacheKeys.CARTS}:*`);
-  //   if (keys.length > 0) {
-  //     await this.redisClient.del(...keys);
-  //     this.logger.log('All cached carts have been cleared');
-  //   }
-  // }
 
   async onModuleDestroy() {
     await this.redisClient.quit();

@@ -1,6 +1,6 @@
 export interface ScrapedProduct {
   title: string;
-  subtitle: string;
+  subtitle: string | null;
   description: string;
   price: number;
   specifications: string;

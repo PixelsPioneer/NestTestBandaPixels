@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
   ForbiddenException,
   mixin,
+  Type,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
@@ -40,7 +41,7 @@ export class AuthGuard implements CanActivate {
   }
 }
 
-export const RolesGuard = (roles: Role[] = []): any => {
+export const RolesGuard = (roles: Role[] = []): Type<CanActivate> => {
   class RoleGuardMixin implements CanActivate {
     constructor(private readonly reflector: Reflector) {}
 
@@ -64,6 +65,5 @@ export const RolesGuard = (roles: Role[] = []): any => {
     }
   }
 
-  const guard = mixin(RoleGuardMixin);
-  return guard;
+  return mixin(RoleGuardMixin);
 };

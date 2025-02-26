@@ -27,7 +27,8 @@ const CartIconWithDropdown = () => {
       const cartResponse = await axiosInstance.get(apiEndpoints.carts.cart, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      const cartData = cartResponse.data || [];
+
+      const cartData = cartResponse.data.items || [];
       const updatedCart = cartData.map((item: any) => ({
         id: item.product.id,
         title: item.product.title,

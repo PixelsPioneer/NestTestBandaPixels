@@ -18,6 +18,7 @@ export class CartService {
 
     if (
       cachedCart &&
+      cachedCart.items &&
       Array.isArray(cachedCart.items) &&
       cachedCart.items.length > 0
     ) {
@@ -33,11 +34,12 @@ export class CartService {
 
     if (!cart || !Array.isArray(cart)) {
       this.logger.error(`Cart query returned invalid data for user ${userId}`);
-      return [];
+      return { items: [] };
     }
 
-    await this.redisService.setCart(userId, cart);
-    return cart;
+    await this.redisService.setCart(userId, { items: cart });
+
+    return { items: cart };
   }
 
   async updateCart({ userId, cartItems }: UpdateCartParams) {
@@ -81,6 +83,6 @@ export class CartService {
       include: { product: true },
     });
 
-    await this.redisService.setCart(userId, updateCart);
+    await this.redisService.setCart(userId, { items: updateCart });
   }
 }

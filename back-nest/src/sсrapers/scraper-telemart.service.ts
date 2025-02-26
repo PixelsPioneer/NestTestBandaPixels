@@ -113,7 +113,7 @@ export class ScraperTelemartService {
 
         const rating = parseFloat(
           element.querySelector('.rate-item__total')?.textContent?.trim() ||
-            null,
+            '0',
         );
 
         const currentPrice =

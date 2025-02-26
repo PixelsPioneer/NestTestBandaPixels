@@ -36,7 +36,7 @@ export class ProductService {
     return products;
   }
 
-  async getProductById(id: number): Promise<Product> {
+  async getProductById(id: number): Promise<Product | null> {
     return this.prisma.product.findUnique({
       where: { id },
     });

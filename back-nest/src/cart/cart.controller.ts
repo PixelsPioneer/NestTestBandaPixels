@@ -20,7 +20,7 @@ export class CartController {
 
   @UseGuards(AuthGuard)
   @Post('update')
-  async updateCart(@User() user, @Body() body: UpdateCartDto) {
+  async updateCart(@User() user: UserDto, @Body() body: UpdateCartDto) {
     this.logger.debug(
       `Received validated request body: ${JSON.stringify(body)}`,
     );
