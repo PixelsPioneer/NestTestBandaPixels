@@ -54,6 +54,32 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     this.logger.log(`Cache for the key ${CacheKeys.PRODUCTS} has been cleared`);
   }
 
+  async setCart(userId: number, cart: any): Promise<void> {
+    const key = `${CacheKeys.CARTS}:${userId}`;
+    await this.set(key, cart, 120);
+    this.logger.log(`Cart for user ${userId} has been cached`);
+  }
+
+  async getCart(userId: number): Promise<any> {
+    const key = `${CacheKeys.CARTS}:${userId}`;
+    const cart = await this.get<any>(key);
+    return cart || { items: [] };
+  }
+
+  async clearCart(userId: number): Promise<void> {
+    const key = `${CacheKeys.CARTS}:${userId}`;
+    await this.redisClient.del(key);
+    this.logger.log(`Cart for user ${userId} has been cleared`);
+  }
+
+  // async clearAllCarts(): Promise<void> {
+  //   const keys = await this.redisClient.keys(`${CacheKeys.CARTS}:*`);
+  //   if (keys.length > 0) {
+  //     await this.redisClient.del(...keys);
+  //     this.logger.log('All cached carts have been cleared');
+  //   }
+  // }
+
   async onModuleDestroy() {
     await this.redisClient.quit();
   }
