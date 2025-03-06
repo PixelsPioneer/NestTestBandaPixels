@@ -2,7 +2,9 @@ import {
   Controller,
   Get,
   Delete,
+  Logger,
   Param,
+  Query,
   UseGuards,
   NotFoundException,
 } from '@nestjs/common';
@@ -13,11 +15,43 @@ import { AuthGuard, RolesGuard } from '../authentication/auth.guard';
 
 @Controller('product')
 export class ProductController {
+  private readonly logger = new Logger(ProductController.name);
   constructor(private readonly productService: ProductService) {}
 
-  @Get()
-  async getAllProducts(): Promise<Product[]> {
-    return this.productService.getAllProducts();
+  @Get('')
+  async searchProducts(
+    @Query('searchTerm') title: string = '',
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 20,
+  ): Promise<{
+    products: Product[];
+    totalPages: number;
+    currentPage: number;
+    hasNextPage: boolean;
+    totalProducts: number;
+  }> {
+    page = Math.max(1, page);
+    limit = Math.max(1, limit);
+
+    const { products, totalProducts } = title
+      ? await this.productService.searchProductsByTitle(title, page, limit)
+      : await this.getPaginatedProducts(page, limit);
+
+    const totalPages = Math.ceil(totalProducts / limit);
+    const hasNextPage = page < totalPages;
+
+    return {
+      products,
+      totalPages,
+      currentPage: page,
+      hasNextPage,
+      totalProducts,
+    };
+  }
+
+  private async getPaginatedProducts(page: number, limit: number) {
+    const allProducts = await this.productService.getAllProducts();
+    return this.productService.getPaginatedProducts(page, limit, allProducts);
   }
 
   @Get(':id')
