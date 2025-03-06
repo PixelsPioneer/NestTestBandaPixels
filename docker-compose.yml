@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+
   db:
     image: mysql:8.0
     container_name: db
@@ -13,45 +14,94 @@ services:
       MYSQL_PASSWORD: rootpassword
     volumes:
       - db_data:/var/lib/mysql
+    networks:
+      - elastic
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
       retries: 5
       start_period: 10s
       timeout: 5s
 
   backend:
-    build:
-      context: ./back-nest
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./back-nest:/app
-    depends_on:
-      - db
-      - redis
+      build:
+        context: ./back-nest
+      ports:
+        - "5000:5000"
+      volumes:
+        - ./back-nest:/app
+      depends_on:
+        - db
+        - redis
+      networks:
+        - elastic
 
   redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 10s
-      retries: 5
-      start_period: 10s
-      timeout: 5s
+      image: redis:latest
+      ports:
+        - "6379:6379"
+      healthcheck:
+        test: [ "CMD", "redis-cli", "ping" ]
+        interval: 10s
+        retries: 5
+        start_period: 10s
+        timeout: 5s
+      networks:
+        - elastic
 
 
   frontend:
-    build:
-      context: ./frontend
+      build:
+        context: ./frontend
+      ports:
+        - "3000:3000"
+      volumes:
+        - ./frontend:/app
+      depends_on:
+        - backend
+      networks:
+        - elastic
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.6.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ELASTIC_USERNAME=elastic
+      - ELASTIC_PASSWORD=rootpassword
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - xpack.security.enabled=false
+    deploy:
+      resources:
+        limits:
+          memory: 8g
+        reservations:
+          memory: 4g
     ports:
-      - "3000:3000"
+      - "9200:9200"
     volumes:
-      - ./frontend:/app
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.6.0
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=rootpassword
+    ports:
+      - "5601:5601"
     depends_on:
-      - backend
+      - elasticsearch
+    networks:
+      - elastic
 
 volumes:
+  esdata:
   db_data:
+
+networks:
+  elastic:
+    driver: bridge
