@@ -1,11 +1,11 @@
 import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 
-import { ProductSearchService } from './search.service';
+import { ElasticSearchService } from './elasticsearch.service';
 import { Product } from './model/product.model';
 
 @Controller('product-search')
-export class ProductSearchController {
-  constructor(private readonly productSearchService: ProductSearchService) {}
+export class ElasticSearchController {
+  constructor(private readonly productSearchService: ElasticSearchService) {}
 
   @Post('index')
   async indexProduct(@Body() product: Product) {

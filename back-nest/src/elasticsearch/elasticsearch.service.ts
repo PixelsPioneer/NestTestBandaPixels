@@ -5,19 +5,13 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { Product } from './model/product.model';
 
 @Injectable()
-export class ProductSearchService {
+export class ElasticSearchService {
   constructor(
     private readonly elasticsearchService: ElasticsearchService,
     private readonly prisma: PrismaService,
   ) {}
 
   async indexProduct(product: Product) {
-    const profileImages = Array.isArray(product.profileImages)
-      ? product.profileImages
-      : product.profileImages && typeof product.profileImages === 'string'
-        ? [product.profileImages]
-        : [];
-
     await this.elasticsearchService.index({
       index: 'products',
       document: {
@@ -29,7 +23,7 @@ export class ProductSearchService {
         newPrice: product.newPrice ?? null,
         specifications: product.specifications,
         type: product.type,
-        profileImages,
+        profileImages: product.profileImages,
         source: product.source,
         hasDiscount: product.hasDiscount,
         rating: product.rating,
