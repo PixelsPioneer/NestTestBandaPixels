@@ -35,6 +35,12 @@ services:
         - redis
       networks:
         - elastic
+      healthcheck:
+        test: [ "CMD", "curl", "-f", "http://localhost:5000/health" ]
+        interval: 10s
+        retries: 5
+        start_period: 10s
+        timeout: 5s
 
   redis:
       image: redis:latest
