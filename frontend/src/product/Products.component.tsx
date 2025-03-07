@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 
+import { apiEndpoints } from '../constants/constants';
 import { useTokenContext } from '../context/TokenContext';
 import { Element } from '../interfaces/Element.component';
 import { toastError, toastSuccess } from '../notification/ToastNotification.component';
@@ -28,7 +29,7 @@ export const ProductsComponent: React.FC = () => {
 
   const getProducts = useMutation({
     mutationFn: async ({ page, searchTerm }: { page: number; searchTerm: string }) => {
-      const response = await axios.get('http://localhost:5000/product', {
+      const response = await axios.get(apiEndpoints.products.products, {
         params: { page, limit: PRODUCTS_PER_PAGE, searchTerm },
       });
       return response.data;

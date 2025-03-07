@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { ChangeEvent, Dispatch, FC, SetStateAction, useCallback, useEffect, useState } from 'react';
 
 import { Search } from '@mui/icons-material';
 import {
@@ -11,9 +11,11 @@ import {
   ListItemText,
   Popover,
 } from '@mui/material';
+import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import debounce from 'lodash/debounce';
 
+import { apiEndpoints } from '../constants/constants';
 import { Element } from '../interfaces/Element.component';
 import styles from './searchBar.module.css';
 
@@ -22,31 +24,30 @@ interface SearchBarProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   searchTerm: string;
-  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  setSearchTerm: Dispatch<SetStateAction<string>>;
 }
 
-export const SearchBar: React.FC<SearchBarProps> = ({ onSelect, isOpen, setIsOpen, searchTerm, setSearchTerm }) => {
+const fetchProducts = async (query: string): Promise<Element[]> => {
+  if (!query.trim()) return [];
+  const response = await axios.get(apiEndpoints.elasticsearch.searchBar, {
+    params: { query, page: 1, limit: 50 },
+  });
+  return Array.isArray(response.data) ? response.data.slice(0, 50) : [];
+};
+
+export const SearchBar: FC<SearchBarProps> = ({ onSelect, isOpen, setIsOpen, searchTerm, setSearchTerm }) => {
   const [filteredResults, setFilteredResults] = useState<Element[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const fetchProducts = async (query: string) => {
-    if (!query.trim()) return [];
-    setIsLoading(true);
-
-    try {
-      const response = await axios.get('http://localhost:5000/product-search/search', {
-        params: { query, page: 1, limit: 50 },
-      });
-      return Array.isArray(response.data) ? response.data.slice(0, 50) : [];
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      return [];
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { mutate: searchProducts, isPending } = useMutation({
+    mutationFn: fetchProducts,
+    onSuccess: results => {
+      setFilteredResults(results);
+      setIsOpen(results.length > 0);
+    },
+  });
 
   const debouncedSearch = useCallback(
     debounce(async (query: string) => {
@@ -63,9 +64,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSelect, isOpen, setIsOpe
 
   useEffect(() => {
     debouncedSearch(searchTerm);
-  }, [searchTerm, debouncedSearch]);
+  }, [searchTerm]);
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
     setAnchorEl(event.currentTarget);
   };
@@ -117,7 +118,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSelect, isOpen, setIsOpe
         {isLoading && searchTerm.trim() ? (
           <div>
             <CircularProgress size={32} className={styles.spinner} />
-            <div className={styles.serchText}>Search...</div>
+            <div className={styles.searchText}>Search...</div>
           </div>
         ) : filteredResults.length === 0 && searchTerm.trim() ? (
           <div className={styles.noResults}>Nothing Found</div>
