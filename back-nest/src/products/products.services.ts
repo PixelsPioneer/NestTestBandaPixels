@@ -5,7 +5,8 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { CacheKeys } from '../redis/cache-keys.constant';
 import { ScrapedProduct } from '../sсrapers/models/scraped-product.model';
-import { ProductSearchService } from '../elasticsearch/search.service';
+import { ElasticSearchService } from '../elasticsearch/elasticsearch.service';
+import { PaginatedProductsDto } from '../dto/paginated-products.dto';
 
 @Injectable()
 export class ProductService {
@@ -14,7 +15,7 @@ export class ProductService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly redisService: RedisService,
-    private readonly productSearchService: ProductSearchService,
+    private readonly productSearchService: ElasticSearchService,
   ) {}
 
   async searchProductsByTitle(title: string, page: number, limit: number) {
@@ -25,7 +26,6 @@ export class ProductService {
       where: {
         title: {
           contains: title,
-          // mode: 'insensitive',
         },
       },
       skip,
@@ -36,7 +36,6 @@ export class ProductService {
       where: {
         title: {
           contains: title,
-          // mode: 'insensitive',
         },
       },
     });
@@ -47,17 +46,14 @@ export class ProductService {
     };
   }
 
-  async getPaginatedProducts(
-    page: number,
-    limit: number,
-    products: Product[],
-  ): Promise<{
+  async getPaginatedProducts(dto: PaginatedProductsDto): Promise<{
     products: Product[];
     totalPages: number;
     currentPage: number;
     hasNextPage: boolean;
     totalProducts: number;
   }> {
+    const { page, limit, products } = dto;
     const skip = (page - 1) * limit;
     const take = limit;
 
@@ -146,9 +142,11 @@ export class ProductService {
       return;
     }
 
-    for (const product of savedProducts) {
-      await this.productSearchService.indexProduct(product);
-    }
+    await Promise.all(
+      savedProducts.map((product) =>
+        this.productSearchService.indexProduct(product),
+      ),
+    );
 
     this.logger.log(
       `Successfully indexed ${savedProducts.length} products in search.`,

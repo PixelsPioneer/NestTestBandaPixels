@@ -8,7 +8,7 @@ import { RedisModule } from './redis/redis.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuthModule } from './authentication/auth.module';
 import { CartModule } from './cart/cart.module';
-import { SearchModule } from './elasticsearch/search.module';
+import { ElasticSearchModule } from './elasticsearch/elasticsearch.module';
 
 @Module({
   imports: [
@@ -43,7 +43,7 @@ import { SearchModule } from './elasticsearch/search.module';
     PrismaModule,
     AuthModule,
     CartModule,
-    SearchModule,
+    ElasticSearchModule,
   ],
   providers: [],
 })
