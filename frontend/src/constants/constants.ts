@@ -16,6 +16,10 @@ export const apiEndpoints = {
     cart: `${backendUrl}/cart`,
     update: `${backendUrl}/cart/update`,
   },
+  elasticsearch: {
+    search: `${backendUrl}/product-search/search`,
+    searchBar: `${backendUrl}/product-search/search-bar`,
+  },
 };
 
 export enum Themes {
