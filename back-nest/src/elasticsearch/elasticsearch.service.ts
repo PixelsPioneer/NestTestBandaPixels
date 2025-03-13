@@ -3,6 +3,7 @@ import { ElasticsearchService } from '@nestjs/elasticsearch';
 
 import { PrismaService } from '../../prisma/prisma.service';
 import { Product } from './model/product.model';
+import { elasticIndex } from '../constant/constants';
 
 @Injectable()
 export class ElasticSearchService {
@@ -13,20 +14,15 @@ export class ElasticSearchService {
 
   async indexProduct(product: Product) {
     await this.elasticsearchService.index({
-      index: 'products',
+      index: elasticIndex.products,
       document: {
         id: product.id,
         title: product.title,
-        subtitle: product.subtitle,
-        description: product.description,
         price: product.price,
         newPrice: product.newPrice ?? null,
-        specifications: product.specifications,
         type: product.type,
         profileImages: product.profileImages,
         source: product.source,
-        hasDiscount: product.hasDiscount,
-        rating: product.rating,
       },
     });
   }

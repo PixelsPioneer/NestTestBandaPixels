@@ -13,20 +13,28 @@ import { ElasticSearchController } from './elasticsearch.controller';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const node = configService.get<string>('ELASTICSEARCH_NODE', '');
-        const username = configService.get<string>(
+        const node = configService.getOrThrow<string>('ELASTICSEARCH_NODE');
+        const username = configService.getOrThrow<string>(
           'ELASTICSEARCH_USERNAME',
-          '',
         );
-        const password = configService.get<string>(
+        const password = configService.getOrThrow<string>(
           'ELASTICSEARCH_PASSWORD',
-          '',
         );
 
-        return {
-          node,
-          auth: username && password ? { username, password } : undefined,
-        };
+        if ((username && !password) || (!username && password)) {
+          throw new Error('Invalid username or password');
+        }
+
+        const config: {
+          node: string;
+          auth?: { username: string; password: string };
+        } = { node };
+
+        if (username && password) {
+          config.auth = { username, password };
+        }
+
+        return config;
       },
     }),
   ],
