@@ -57,7 +57,6 @@ export const PaginationComponent: React.FC<PaginationProps> = ({
             }}
           />
         )}
-        // Деактивація кнопок "Previous" і "Next"
         disabled={disablePrev && disableNext}
       />
     </div>
