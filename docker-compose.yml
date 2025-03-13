@@ -33,6 +33,7 @@ services:
       depends_on:
         - db
         - redis
+        - elasticsearch
       networks:
         - elastic
       healthcheck:
