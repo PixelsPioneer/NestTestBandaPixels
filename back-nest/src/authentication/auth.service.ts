@@ -6,8 +6,8 @@ import { Role } from '@prisma/client';
 import { UsersService } from './user.service';
 import { SignInDto } from '../dto/signIn.dto';
 import { SignUpDto } from '../dto/signup.dto';
-import { jwtConfig } from './constants';
-import { tokenTypes } from './constants';
+import { jwtConfig } from '../constant/constants';
+import { tokenTypes } from '../constant/constants';
 
 @Injectable()
 export class AuthService {
