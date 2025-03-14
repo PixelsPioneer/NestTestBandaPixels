@@ -39,7 +39,7 @@ export class ScraperController {
     const productsToUpsert: ScrapedProduct[] = [];
 
     for (const product of scrapedProducts) {
-      if (product.profileImages && product.profileImages.length > 0) {
+      if (product.profileImages?.length) {
         const productSerialNumber = product.title.match(/\(([^)]+)\)/);
 
         const productFolder =
