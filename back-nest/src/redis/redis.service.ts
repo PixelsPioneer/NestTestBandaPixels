@@ -76,4 +76,18 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async onModuleDestroy() {
     await this.redisClient.quit();
   }
+
+  async saveProductImages(productFolder: string, images: string[]) {
+    if (images.length > 0) {
+      await this.redisClient.set(
+        `product-image:${productFolder}`,
+        JSON.stringify(images),
+      );
+    }
+  }
+
+  async getProductImages(productFolder: string): Promise<string[]> {
+    const images = await this.redisClient.get(`product-image:${productFolder}`);
+    return images ? JSON.parse(images) : [];
+  }
 }

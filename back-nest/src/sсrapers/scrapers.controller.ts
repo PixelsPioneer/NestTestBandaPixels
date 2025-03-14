@@ -1,9 +1,13 @@
 import { Controller, Get, HttpCode, Logger } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 
 import { ProductService } from '../products/products.services';
 import { ScraperTelemartService } from './scraper-telemart.service';
 import { ScraperRozetkaService } from './scraper-rozetka.service';
 import { Sources } from './models/sources';
+import { S3Service } from '../s3/s3.service';
+import { ScrapedProduct } from './models/scraped-product.model';
+import { RedisService } from '../redis/redis.service';
 
 @Controller('scraper')
 export class ScraperController {
@@ -13,6 +17,8 @@ export class ScraperController {
     private readonly telemartScraperService: ScraperTelemartService,
     private readonly rozetkaScraperService: ScraperRozetkaService,
     private readonly productService: ProductService,
+    private readonly s3Service: S3Service,
+    private readonly redisService: RedisService,
   ) {}
 
   @HttpCode(204)
@@ -30,7 +36,44 @@ export class ScraperController {
       `Scraped ${scrapedProducts.length} products from Telemart.`,
     );
 
-    await this.productService.upsertProducts(scrapedProducts);
+    const productsToUpsert: ScrapedProduct[] = [];
+
+    for (const product of scrapedProducts) {
+      if (product.profileImages?.length) {
+        const productSerialNumber = product.title.match(/\(([^)]+)\)/);
+
+        const productFolder =
+          productSerialNumber?.[1] ||
+          product.title.replace(/[^a-zA-Z0-9_-]/g, '_') ||
+          randomUUID();
+
+        const uploadedImageUrls = await Promise.all(
+          product.profileImages.map(async (imageUrl, index) => {
+            return await this.s3Service.uploadImage(
+              imageUrl,
+              `${productFolder}/${index}`,
+            );
+          }),
+        );
+
+        const images = uploadedImageUrls.filter(
+          (url): url is string => url !== null,
+        );
+
+        await this.redisService.saveProductImages(productFolder, images);
+
+        productsToUpsert.push({
+          ...product,
+          profileImages: images,
+        });
+
+        this.logger.log(
+          `Uploaded ${product.profileImages.length} images for product ${product.title}`,
+        );
+      }
+    }
+
+    await this.productService.upsertProducts(productsToUpsert);
 
     this.logger.log(
       `Successfully processed ${scrapedProducts.length} products from ${Sources.Telemart}.`,
@@ -53,6 +96,43 @@ export class ScraperController {
     }
 
     this.logger.log(`Scraped ${scrapedProducts.length} products from Rozetka.`);
+
+    const productsToUpsert: ScrapedProduct[] = [];
+
+    for (const product of scrapedProducts) {
+      if (product.profileImages && product.profileImages.length > 0) {
+        const productSerialNumber = product.title.match(/\(([^)]+)\)/);
+
+        const productFolder =
+          productSerialNumber?.[1] ||
+          product.title.replace(/[^a-zA-Z0-9_-]/g, '_') ||
+          randomUUID();
+
+        const uploadedImageUrls = await Promise.all(
+          product.profileImages.map(async (imageUrl, index) => {
+            return await this.s3Service.uploadImage(
+              imageUrl,
+              `${productFolder}/${index}`,
+            );
+          }),
+        );
+
+        const images = uploadedImageUrls.filter(
+          (url): url is string => url !== null,
+        );
+
+        await this.redisService.saveProductImages(productFolder, images);
+
+        productsToUpsert.push({
+          ...product,
+          profileImages: images,
+        });
+
+        this.logger.log(
+          `Uploaded ${product.profileImages.length} images for product ${product.title}`,
+        );
+      }
+    }
 
     await this.productService.upsertProducts(scrapedProducts);
 

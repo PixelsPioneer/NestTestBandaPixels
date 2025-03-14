@@ -2,7 +2,11 @@ import {
   Controller,
   Get,
   Delete,
+  Logger,
   Param,
+  Query,
+  UsePipes,
+  ValidationPipe,
   UseGuards,
   NotFoundException,
 } from '@nestjs/common';
@@ -10,14 +14,44 @@ import { Product } from '@prisma/client';
 
 import { ProductService } from './products.services';
 import { AuthGuard, RolesGuard } from '../authentication/auth.guard';
+import { SearchProductsDto } from '../dto/search-products.dto';
+import { PaginatedProductsDto } from '../dto/paginated-products.dto';
+import { PaginatedResponseModel } from './model/paginatination-return.model';
 
 @Controller('product')
 export class ProductController {
+  private readonly logger = new Logger(ProductController.name);
   constructor(private readonly productService: ProductService) {}
 
   @Get()
-  async getAllProducts(): Promise<Product[]> {
-    return this.productService.getAllProducts();
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async searchProducts(
+    @Query() query: SearchProductsDto,
+  ): Promise<PaginatedResponseModel> {
+    const { searchTerm = '', page = 1, limit = 20 } = query;
+
+    const allProducts = await this.productService.getAllProducts();
+
+    const paginatedDto: PaginatedProductsDto = {
+      page,
+      limit,
+      products: allProducts,
+    };
+
+    const { products, totalProducts } = searchTerm
+      ? await this.productService.searchProductsByTitle(searchTerm, page, limit)
+      : await this.productService.getPaginatedProducts(paginatedDto);
+
+    const totalPages = Math.ceil(totalProducts / limit);
+    const hasNextPage = page < totalPages;
+
+    return new PaginatedResponseModel(
+      products,
+      totalPages,
+      page,
+      hasNextPage,
+      totalProducts,
+    );
   }
 
   @Get(':id')

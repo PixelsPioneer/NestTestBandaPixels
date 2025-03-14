@@ -33,6 +33,9 @@ body {
   --selected-card: #4caf50;
   --card-shadow: #00000033;
   --card-borders: #282c34;
+  --button-color: #0078ff;
+  --button-hover: #0352a6;
+
 }
 
 .dark-theme {
@@ -56,6 +59,10 @@ body {
   --hover-button-text: var(--black);
   --cart-color: var(--white);
   --cart-color-hover: var(--confirm-color);
+  --pagination-button-active: var(--confirm-color) ;
+  --pagination-button-hover: var(--confirm-color-hover);
+  --pagination-color: var(--black);
+  --search-border: var(--form);
 }
 
 .light-theme {
@@ -79,4 +86,8 @@ body {
   --hover-button-text: var(--white);
   --cart-color: var(--black);
   --cart-color-hover: var(--confirm-color);
+  --pagination-button-active: var(--button-color);
+  --pagination-button-hover: var(--button-hover);
+  --pagination-color: var(--white);
+  --search-border: var(--grey);
 }

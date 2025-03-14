@@ -12,7 +12,7 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { Role } from '@prisma/client';
 
-import { jwtConfig } from './constants';
+import { jwtConfig } from '../constant/constants';
 
 @Injectable()
 export class AuthGuard implements CanActivate {

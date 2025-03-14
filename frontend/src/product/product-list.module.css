@@ -1,3 +1,8 @@
+.search {
+  width: auto;
+  margin: 50px;
+}
+
 .mainCard {
   display: flex;
   justify-content: center;
@@ -184,6 +189,13 @@
   background: none;
   border: none;
   cursor: pointer;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 50px;
 }
 
 

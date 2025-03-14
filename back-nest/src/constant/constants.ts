@@ -7,3 +7,7 @@ export const tokenTypes = {
   access: 'access',
   refresh: 'refresh',
 };
+
+export const elasticIndex = {
+  products: 'products',
+};

@@ -1,0 +1,102 @@
+.searchBar {
+    background-color: var(--background-color);
+    border-radius: 20px;
+    border: 1px solid var(--search-border);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 5px 15px;
+}
+
+.searchIcon {
+    color: var(--text-color);
+}
+
+.loadingContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 100px;
+}
+
+.spinner {
+    margin-top: 20px;
+    color: var(--pagination-button-active);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    height: auto;
+}
+
+.serchText {
+    margin-top: 10px;
+    margin-left: -22px;
+    color: var(--text-color);
+    font-size: 20px;
+    font-weight: bold;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.noResults {
+    font-size: 20px;
+    color: var(--text-color);
+    font-weight: bold;
+    text-align: center;
+}
+
+
+.searchBar:focus-within {
+    border: 1px solid var(--pagination-button-active);
+}
+
+.searchBar input {
+    color: var(--text-color);
+    font-size: 20px;
+    font-weight: bold;
+    border: none;
+    outline: none;
+    padding: 10px;
+    width: 100%;
+    background-color: transparent;
+}
+
+.listContainer{
+    background-color: var(--background-color);
+    color: var(--text-color);
+    max-height: 500px;
+}
+
+.listItem{
+    padding: 10px 10px;
+    margin: 10px;
+}
+
+.listItemText {
+    margin-left: 20px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.MuiOutlinedInput-root {
+    border: none;
+    box-shadow: none;
+}
+
+.MuiOutlinedInput-root.Mui-focused {
+    border: none;
+    box-shadow: none;
+}
+
+.MuiTextField-root {
+    border: none;
+}
