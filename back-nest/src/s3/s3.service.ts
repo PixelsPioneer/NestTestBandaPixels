@@ -18,17 +18,18 @@ export class S3Service {
   constructor(private readonly configService: ConfigService) {
     try {
       this.s3 = new S3Client({
-        region: this.configService.get<string>('AWS_REGION') ?? '',
+        region: this.configService.getOrThrow<string>('AWS_REGION') ?? '',
         credentials: {
           accessKeyId:
-            this.configService.get<string>('AWS_ACCESS_KEY_ID') ?? '',
+            this.configService.getOrThrow<string>('AWS_ACCESS_KEY_ID') ?? '',
           secretAccessKey:
-            this.configService.get<string>('AWS_SECRET_ACCESS_KEY') ?? '',
+            this.configService.getOrThrow<string>('AWS_SECRET_ACCESS_KEY') ??
+            '',
         },
       });
 
       this.bucketName =
-        this.configService.get<string>('AWS_S3_BUCKET_NAME') ?? '';
+        this.configService.getOrThrow<string>('AWS_S3_BUCKET_NAME') ?? '';
 
       this.logger.log('Successfully connected to AWS S3');
     } catch (error) {
@@ -48,7 +49,7 @@ export class S3Service {
         responseType: 'arraybuffer',
       });
 
-      const fileExtension = path.extname(imageUrl).split('?')[0] || '.jpg';
+      const fileExtension = path.extname(imageUrl)?.split('?')[0] || '.jpg';
       const fileName = `products/${productId}_${Date.now()}${fileExtension}`;
 
       const uploadParams = {
