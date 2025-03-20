@@ -36,6 +36,8 @@ services:
         - elasticsearch
       networks:
         - elastic
+      command:
+        - npm run migrate
       healthcheck:
         test: [ "CMD", "curl", "-f", "http://localhost:5000/health" ]
         interval: 10s
