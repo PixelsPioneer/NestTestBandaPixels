@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Section` MODIFY `url` VARCHAR(2048) NOT NULL;

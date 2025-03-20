@@ -7,6 +7,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model ScrapedCategory {
+  id            Int           @id @default(autoincrement())
+  catalogId     String        @unique
+  name          String        @db.VarChar(50)
+  subcategories Subcategory[]
+}
+
+model Subcategory {
+  id         Int    @id @default(autoincrement())
+  name       String
+  categoryId Int
+
+  category ScrapedCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  sections Section[]
+}
+
+model Section {
+  id            Int    @id @default(autoincrement())
+  name          String
+  url           String @db.VarChar(2048)
+  subcategoryId Int
+
+  subcategory Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+}
+
 model Product {
   id             Int     @id @default(autoincrement())
   title          String  @unique @db.VarChar(256)
