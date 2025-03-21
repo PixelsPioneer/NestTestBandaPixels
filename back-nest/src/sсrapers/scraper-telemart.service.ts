@@ -1,15 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common';
 import puppeteer from 'puppeteer';
+import { randomUUID } from 'crypto';
 
 import { Sources } from './models/sources';
 import { RedisService } from '../redis/redis.service';
+import { ProductService } from '../products/products.services';
 import { ScrapedProduct } from './models/scraped-product.model';
+import { S3Service } from '../s3/s3.service';
 
 @Injectable()
 export class ScraperTelemartService {
   private readonly logger = new Logger(ScraperTelemartService.name);
 
-  constructor(private readonly redisService: RedisService) {}
+  constructor(
+    private readonly redisService: RedisService,
+    private readonly s3Service: S3Service,
+    private readonly productService: ProductService,
+  ) {}
 
   async scrapeTelemart(): Promise<ScrapedProduct[]> {
     const url = 'https://telemart.ua/ua/pc/';
@@ -168,5 +175,62 @@ export class ScraperTelemartService {
     await browser.close();
 
     return rawProducts;
+  }
+
+  async scrapeAndSaveTelemartProducts(): Promise<void> {
+    this.logger.log('Starting Telemart scraping...');
+    const scrapedProducts = await this.scrapeTelemart();
+
+    if (!scrapedProducts || scrapedProducts.length === 0) {
+      this.logger.warn('No products were scraped from Telemart.');
+      return;
+    }
+
+    this.logger.log(
+      `Scraped ${scrapedProducts.length} products from Telemart.`,
+    );
+
+    const productsToUpsert: ScrapedProduct[] = [];
+
+    for (const product of scrapedProducts) {
+      if (product.profileImages?.length) {
+        const productSerialNumber = product.title.match(/\(([^)]+)\)/);
+
+        const productFolder =
+          productSerialNumber?.[1] ||
+          product.title.replace(/[^a-zA-Z0-9_-]/g, '_') ||
+          randomUUID();
+
+        const uploadedImageUrls = await Promise.all(
+          product.profileImages.map(async (imageUrl, index) => {
+            return await this.s3Service.uploadImage(
+              imageUrl,
+              `${productFolder}/${index}`,
+            );
+          }),
+        );
+
+        const images = uploadedImageUrls.filter(
+          (url): url is string => url !== null,
+        );
+
+        await this.redisService.saveProductImages(productFolder, images);
+
+        productsToUpsert.push({
+          ...product,
+          profileImages: images,
+        });
+
+        this.logger.log(
+          `Uploaded ${product.profileImages.length} images for product ${product.title}`,
+        );
+      }
+    }
+
+    await this.productService.upsertProducts(productsToUpsert);
+
+    this.logger.log(
+      `Successfully processed ${scrapedProducts.length} products from ${Sources.Telemart}.`,
+    );
   }
 }
