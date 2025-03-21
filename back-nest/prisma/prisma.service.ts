@@ -5,17 +5,21 @@ import {
   Logger,
 } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
+  constructor(private readonly configService: ConfigService) {
+    super();
+  }
   private readonly logger = new Logger(PrismaService.name);
 
   async onModuleInit() {
     await this.$connect();
-    const dbUrl = process.env.DATABASE_URL;
+    const dbUrl = this.configService.getOrThrow<string>('DATABASE_URL');
     this.logger.log(`Conected to the database ${dbUrl}`);
   }
 
