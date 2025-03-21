@@ -3,6 +3,7 @@ import * as puppeteer from 'puppeteer';
 
 import { ScrapedCategory, Subcategory } from './models/catalog.models';
 import { PrismaService } from '../../prisma/prisma.service';
+import { ScrapedCategoryDto } from '../dto/catalogCategories.dto';
 
 @Injectable()
 export class ScraperCatalogService {
@@ -81,5 +82,63 @@ export class ScraperCatalogService {
     );
 
     return categories;
+  }
+
+  async scrapeAndSaveCategories(): Promise<ScrapedCategoryDto[]> {
+    this.logger.log('Start to get catalog service...');
+    const scrapedCatalog = await this.scrapeCategories();
+
+    if (!scrapedCatalog || scrapedCatalog.length === 0) {
+      this.logger.warn('No categories found in scraped catalog from Telemart.');
+      return [];
+    }
+
+    try {
+      for (const category of scrapedCatalog) {
+        const { id: scrapedId, name, subcategories } = category;
+
+        const savedCategory = await this.prismaService.scrapedCategory.upsert({
+          where: { catalogId: scrapedId },
+          update: { name },
+          create: {
+            catalogId: scrapedId,
+            name,
+            subcategories: {
+              create: subcategories.map((sub) => ({
+                name: sub.name,
+                sections: {
+                  create: sub.sections.map((section) => ({
+                    name: section.name,
+                    url: section.url,
+                  })),
+                },
+              })),
+            },
+          },
+        });
+
+        this.logger.log(
+          `Category ${name} saved to DB with ID ${savedCategory.id}.`,
+        );
+      }
+    } catch (error) {
+      this.logger.error('Failed to save categories to DB', error);
+    }
+
+    this.logger.log(
+      `Scraped ${scrapedCatalog.length} categories from Telemart.`,
+    );
+
+    return scrapedCatalog.map((category) => ({
+      id: category.id,
+      name: category.name,
+      subcategories: category.subcategories.map((sub) => ({
+        name: sub.name,
+        sections: sub.sections.map((section) => ({
+          name: section.name,
+          url: section.url,
+        })),
+      })),
+    }));
   }
 }
