@@ -35,7 +35,3 @@ RUN npm run prisgen
 RUN npm run build
 
 ENTRYPOINT ["sh", "-c", "npm run migrate && npm run start"]
-
-CMD ["npm", "run", "start:dev"]
-
-
