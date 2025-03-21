@@ -40,12 +40,11 @@ export class ScraperController {
       for (const category of scrapedCatalog) {
         const { id: scrapedId, name, subcategories } = category;
 
-        // Перевіряємо, чи є цей scraped_id у БД
         const savedCategory = await this.prismaService.scrapedCategory.upsert({
-          where: { catalogId: scrapedId }, // Пошук за catalogId, а не id
+          where: { catalogId: scrapedId },
           update: { name },
           create: {
-            catalogId: scrapedId, // Збереження скрапленого ID у catalogId
+            catalogId: scrapedId,
             name,
             subcategories: {
               create: subcategories.map((sub) => ({

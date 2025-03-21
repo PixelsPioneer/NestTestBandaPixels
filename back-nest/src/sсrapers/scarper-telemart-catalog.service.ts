@@ -1,18 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as puppeteer from 'puppeteer';
 
+import { ScrapedCategory, Subcategory } from './models/catalog.models';
 import { PrismaService } from '../../prisma/prisma.service';
-
-export interface Subcategory {
-  name: string;
-  sections: { name: string; url: string }[];
-}
-
-export interface ScrapedCategory {
-  id: string;
-  name: string;
-  subcategories: Subcategory[];
-}
 
 @Injectable()
 export class ScraperCatalogService {
