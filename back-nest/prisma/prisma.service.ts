@@ -19,8 +19,8 @@ export class PrismaService
 
   async onModuleInit() {
     await this.$connect();
-    const dbUrl = this.configService.getOrThrow<string>('DATABASE_URL');
-    this.logger.log(`Conected to the database ${dbUrl}`);
+    const _dbUrl = this.configService.getOrThrow<string>('DATABASE_URL');
+    this.logger.log('Connected to the database');
   }
 
   async onModuleDestroy() {
