@@ -19,7 +19,7 @@ export class ScraperTelemartService implements ScraperService {
     private readonly productService: ProductService,
   ) {}
 
-  async scrapeTelemart(): Promise<ScrapedProduct[]> {
+  async scrapeProducts(): Promise<ScrapedProduct[]> {
     const url = 'https://telemart.ua/ua/pc/';
     const browser = await puppeteer.launch({
       args: ['--no-sandbox'],
@@ -180,7 +180,7 @@ export class ScraperTelemartService implements ScraperService {
 
   async scrapeAndSave(): Promise<void> {
     this.logger.log('Starting Telemart scraping...');
-    const scrapedProducts = await this.scrapeTelemart();
+    const scrapedProducts = await this.scrapeProducts();
 
     if (!scrapedProducts || scrapedProducts.length === 0) {
       this.logger.warn('No products were scraped from Telemart.');

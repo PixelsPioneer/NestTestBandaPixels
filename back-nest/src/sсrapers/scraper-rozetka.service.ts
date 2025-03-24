@@ -20,7 +20,7 @@ export class ScraperRozetkaService implements ScraperService {
     private readonly s3Service: S3Service,
   ) {}
 
-  async scrapeRozetkaProducts(): Promise<ScrapedProduct[]> {
+  async scrapeProducts(): Promise<ScrapedProduct[]> {
     const url = 'https://rozetka.com.ua/ua/computers-notebooks/c80095/';
     this.logger.log(`Starting scraping Rozetka URL: ${url}`);
 
@@ -186,7 +186,7 @@ export class ScraperRozetkaService implements ScraperService {
   async scrapeAndSave(): Promise<void> {
     this.logger.log('Starting to scrape products from Rozetka...');
 
-    const scrapedProducts = await this.scrapeRozetkaProducts();
+    const scrapedProducts = await this.scrapeProducts();
 
     if (!scrapedProducts || scrapedProducts.length === 0) {
       this.logger.warn('No products were scraped from Rozetka.');
