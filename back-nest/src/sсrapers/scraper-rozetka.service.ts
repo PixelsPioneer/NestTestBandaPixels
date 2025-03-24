@@ -6,11 +6,12 @@ import { randomUUID } from 'crypto';
 import { Sources } from './models/sources';
 import { ScrapedProduct } from './models/scraped-product.model';
 import { ProductService } from '../products/products.services';
+import { ScraperService } from './models/scraper-service.model';
 import { S3Service } from '../s3/s3.service';
 import { RedisService } from '../redis/redis.service';
 
 @Injectable()
-export class ScraperRozetkaService {
+export class ScraperRozetkaService implements ScraperService {
   private readonly logger = new Logger(ScraperRozetkaService.name);
 
   constructor(

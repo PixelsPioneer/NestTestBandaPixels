@@ -6,10 +6,11 @@ import { Sources } from './models/sources';
 import { RedisService } from '../redis/redis.service';
 import { ProductService } from '../products/products.services';
 import { ScrapedProduct } from './models/scraped-product.model';
+import { ScraperService } from './models/scraper-service.model';
 import { S3Service } from '../s3/s3.service';
 
 @Injectable()
-export class ScraperTelemartService {
+export class ScraperTelemartService implements ScraperService {
   private readonly logger = new Logger(ScraperTelemartService.name);
 
   constructor(

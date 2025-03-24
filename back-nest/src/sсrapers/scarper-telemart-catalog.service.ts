@@ -4,9 +4,10 @@ import * as puppeteer from 'puppeteer';
 import { ScrapedCategory, Subcategory } from './models/catalog.models';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ScrapedCategoryDto } from '../dto/catalogCategories.dto';
+import { ScraperService } from './models/scraper-service.model';
 
 @Injectable()
-export class ScraperCatalogService {
+export class ScraperCatalogService implements ScraperService {
   private readonly logger = new Logger(ScraperCatalogService.name);
 
   constructor(private readonly prismaService: PrismaService) {}
