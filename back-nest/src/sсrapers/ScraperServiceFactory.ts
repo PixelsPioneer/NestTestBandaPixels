@@ -34,7 +34,7 @@ export class ScraperServiceFactory {
       case ServiceType.Catalog:
         return this.catalogScraperService;
       default:
-        this.logger.error('Invalid service type');
+        this.logger.error(`Invalid service type ${type}`);
         throw new InternalServerErrorException(`Invalid service type ${type}`);
     }
   }
