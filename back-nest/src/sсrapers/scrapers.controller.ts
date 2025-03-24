@@ -1,7 +1,6 @@
-import { Controller, Get, HttpCode, Logger } from '@nestjs/common';
+import { Controller, Param, Get, HttpCode, Logger } from '@nestjs/common';
 
-import { ScraperServiceFactory } from './ScraperServiceFactory';
-import { ScrapedCategoryDto } from '../dto/catalogCategories.dto';
+import { ScraperServiceFactory, ServiceType } from './ScraperServiceFactory';
 
 @Controller('scraper')
 export class ScraperController {
@@ -9,51 +8,12 @@ export class ScraperController {
 
   constructor(private readonly scraperServiceFactory: ScraperServiceFactory) {}
 
-  @HttpCode(200)
-  @Get('catalog')
-  async catalogService(): Promise<ScrapedCategoryDto[]> {
-    const catalogScraperService =
-      this.scraperServiceFactory.createService('catalog');
-
-    if ('scrapeAndSaveCategories' in catalogScraperService) {
-      return catalogScraperService.scrapeAndSaveCategories();
-    }
-
-    this.logger.error(
-      'scrapeAndSaveCategories method is not available on this service.',
+  @HttpCode(204)
+  @Get(':serviceType')
+  async scrape(@Param('serviceType') serviceType: string): Promise<void> {
+    const scraperService = this.scraperServiceFactory.createService(
+      serviceType as ServiceType,
     );
-    return [];
-  }
-
-  @HttpCode(204)
-  @Get('scrape-telemart')
-  async scrapeTelemart(): Promise<void> {
-    const telemartScraperService =
-      this.scraperServiceFactory.createService('telemart');
-
-    if ('scrapeAndSaveTelemartProducts' in telemartScraperService) {
-      await telemartScraperService.scrapeAndSaveTelemartProducts();
-    } else {
-      this.logger.error(
-        'scrapeAndSaveTelemartProducts method is not available on this service.',
-      );
-      return;
-    }
-  }
-
-  @HttpCode(204)
-  @Get('scrape-rozetka')
-  async scrapeRozetka(): Promise<void> {
-    const rozetkaScraperService =
-      this.scraperServiceFactory.createService('rozetka');
-
-    if ('scrapeAndSaveRozetkaProducts' in rozetkaScraperService) {
-      await rozetkaScraperService.scrapeAndSaveRozetkaProducts();
-    } else {
-      this.logger.error(
-        'scrapeAndSaveRozetkaProducts method is not available on this service.',
-      );
-      return;
-    }
+    await scraperService.scrapeAndSave();
   }
 }
