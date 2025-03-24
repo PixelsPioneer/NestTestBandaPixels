@@ -3,7 +3,6 @@ import * as puppeteer from 'puppeteer';
 
 import { ScrapedCategory, Subcategory } from './models/catalog.models';
 import { PrismaService } from '../../prisma/prisma.service';
-import { ScrapedCategoryDto } from '../dto/catalogCategories.dto';
 import { ScraperService } from './models/scraper-service.model';
 
 @Injectable()
@@ -85,13 +84,13 @@ export class ScraperCatalogService implements ScraperService {
     return categories;
   }
 
-  async scrapeAndSaveCategories(): Promise<ScrapedCategoryDto[]> {
+  async scrapeAndSave(): Promise<void> {
     this.logger.log('Start to get catalog service...');
     const scrapedCatalog = await this.scrapeCategories();
 
     if (!scrapedCatalog || scrapedCatalog.length === 0) {
       this.logger.warn('No categories found in scraped catalog from Telemart.');
-      return [];
+      return;
     }
 
     try {
@@ -129,17 +128,5 @@ export class ScraperCatalogService implements ScraperService {
     this.logger.log(
       `Scraped ${scrapedCatalog.length} categories from Telemart.`,
     );
-
-    return scrapedCatalog.map((category) => ({
-      id: category.id,
-      name: category.name,
-      subcategories: category.subcategories.map((sub) => ({
-        name: sub.name,
-        sections: sub.sections.map((section) => ({
-          name: section.name,
-          url: section.url,
-        })),
-      })),
-    }));
   }
 }
