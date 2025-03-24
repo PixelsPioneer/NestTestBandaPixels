@@ -1,18 +1,26 @@
 import { Injectable, Logger } from '@nestjs/common';
 import puppeteer from 'puppeteer';
 import * as cheerio from 'cheerio';
+import { randomUUID } from 'crypto';
 
 import { Sources } from './models/sources';
 import { ScrapedProduct } from './models/scraped-product.model';
+import { ProductService } from '../products/products.services';
+import { ScraperService } from './models/scraper-service.model';
+import { S3Service } from '../s3/s3.service';
 import { RedisService } from '../redis/redis.service';
 
 @Injectable()
-export class ScraperRozetkaService {
+export class ScraperRozetkaService implements ScraperService {
   private readonly logger = new Logger(ScraperRozetkaService.name);
 
-  constructor(private readonly redisService: RedisService) {}
+  constructor(
+    private readonly redisService: RedisService,
+    private readonly productService: ProductService,
+    private readonly s3Service: S3Service,
+  ) {}
 
-  async scrapeRozetkaProducts(): Promise<ScrapedProduct[]> {
+  async scrapeProducts(): Promise<ScrapedProduct[]> {
     const url = 'https://rozetka.com.ua/ua/computers-notebooks/c80095/';
     this.logger.log(`Starting scraping Rozetka URL: ${url}`);
 
@@ -173,5 +181,61 @@ export class ScraperRozetkaService {
     await browser.close();
 
     return products;
+  }
+
+  async scrapeAndSave(): Promise<void> {
+    this.logger.log('Starting to scrape products from Rozetka...');
+
+    const scrapedProducts = await this.scrapeProducts();
+
+    if (!scrapedProducts || scrapedProducts.length === 0) {
+      this.logger.warn('No products were scraped from Rozetka.');
+      return;
+    }
+
+    this.logger.log(`Scraped ${scrapedProducts.length} products from Rozetka.`);
+
+    const productsToUpsert: ScrapedProduct[] = [];
+
+    for (const product of scrapedProducts) {
+      if (product.profileImages && product.profileImages.length > 0) {
+        const productSerialNumber = product.title.match(/\(([^)]+)\)/);
+
+        const productFolder =
+          productSerialNumber?.[1] ||
+          product.title.replace(/[^a-zA-Z0-9_-]/g, '_') ||
+          randomUUID();
+
+        const uploadedImageUrls = await Promise.all(
+          product.profileImages.map(async (imageUrl, index) => {
+            return await this.s3Service.uploadImage(
+              imageUrl,
+              `${productFolder}/${index}`,
+            );
+          }),
+        );
+
+        const images = uploadedImageUrls.filter(
+          (url): url is string => url !== null,
+        );
+
+        await this.redisService.saveProductImages(productFolder, images);
+
+        productsToUpsert.push({
+          ...product,
+          profileImages: images,
+        });
+
+        this.logger.log(
+          `Uploaded ${product.profileImages.length} images for product ${product.title}`,
+        );
+      }
+    }
+
+    await this.productService.upsertProducts(scrapedProducts);
+
+    this.logger.log(
+      `Successfully processed ${scrapedProducts.length} products from ${Sources.Rozetka}`,
+    );
   }
 }
