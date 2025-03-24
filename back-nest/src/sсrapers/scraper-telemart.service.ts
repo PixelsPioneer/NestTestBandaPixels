@@ -178,7 +178,7 @@ export class ScraperTelemartService implements ScraperService {
     return rawProducts;
   }
 
-  async scrapeAndSaveTelemartProducts(): Promise<void> {
+  async scrapeAndSave(): Promise<void> {
     this.logger.log('Starting Telemart scraping...');
     const scrapedProducts = await this.scrapeTelemart();
 

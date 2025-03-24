@@ -183,7 +183,7 @@ export class ScraperRozetkaService implements ScraperService {
     return products;
   }
 
-  async scrapeAndSaveRozetkaProducts(): Promise<void> {
+  async scrapeAndSave(): Promise<void> {
     this.logger.log('Starting to scrape products from Rozetka...');
 
     const scrapedProducts = await this.scrapeRozetkaProducts();
