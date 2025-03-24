@@ -1,8 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+} from '@nestjs/common';
 
 import { ScraperTelemartService } from './scraper-telemart.service';
 import { ScraperRozetkaService } from './scraper-rozetka.service';
 import { ScraperCatalogService } from './scarper-telemart-catalog.service';
+
+export enum ServiceType {
+  Telemart = 'telemart',
+  Rozetka = 'rozetka',
+  Catalog = 'catalog',
+}
 
 @Injectable()
 export class ScraperServiceFactory {
@@ -10,18 +20,22 @@ export class ScraperServiceFactory {
     private readonly telemartScraperService: ScraperTelemartService,
     private readonly rozetkaScraperService: ScraperRozetkaService,
     private readonly catalogScraperService: ScraperCatalogService,
+    private readonly logger = new Logger(ScraperServiceFactory.name),
   ) {}
 
-  createService(serviceType: string) {
-    switch (serviceType) {
-      case 'telemart':
+  createService(
+    type: ServiceType,
+  ): ScraperCatalogService | ScraperTelemartService | ScraperRozetkaService {
+    switch (type) {
+      case ServiceType.Telemart:
         return this.telemartScraperService;
-      case 'rozetka':
+      case ServiceType.Rozetka:
         return this.rozetkaScraperService;
-      case 'catalog':
+      case ServiceType.Catalog:
         return this.catalogScraperService;
       default:
-        throw new Error('Invalid service type');
+        this.logger.error('Invalid service type');
+        throw new InternalServerErrorException(`Invalid service type ${type}`);
     }
   }
 }
