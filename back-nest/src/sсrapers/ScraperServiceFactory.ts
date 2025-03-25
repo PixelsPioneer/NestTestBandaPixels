@@ -16,11 +16,12 @@ export enum ServiceType {
 
 @Injectable()
 export class ScraperServiceFactory {
+  private readonly logger = new Logger(ScraperServiceFactory.name);
+
   constructor(
     private readonly telemartScraperService: ScraperTelemartService,
     private readonly rozetkaScraperService: ScraperRozetkaService,
     private readonly catalogScraperService: ScraperCatalogService,
-    private readonly logger = new Logger(ScraperServiceFactory.name),
   ) {}
 
   createService(
