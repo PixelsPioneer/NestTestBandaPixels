@@ -1,19 +1,14 @@
-import { Controller, Param, Get, HttpCode, Logger } from '@nestjs/common';
+import { Controller, Param, Get, HttpCode } from '@nestjs/common';
 
-import { ScraperServiceFactory, ServiceType } from './ScraperServiceFactory';
+import { ScraperGateway } from '../ws.getway';
 
 @Controller('scraper')
 export class ScraperController {
-  private readonly logger = new Logger(ScraperController.name);
-
-  constructor(private readonly scraperServiceFactory: ScraperServiceFactory) {}
+  constructor(private readonly scraperGateway: ScraperGateway) {}
 
   @HttpCode(204)
   @Get(':serviceType')
   async scrape(@Param('serviceType') serviceType: string): Promise<void> {
-    const scraperService = this.scraperServiceFactory.createService(
-      serviceType as ServiceType,
-    );
-    await scraperService.scrapeAndSave();
+    this.scraperGateway.handleScraping(serviceType);
   }
 }

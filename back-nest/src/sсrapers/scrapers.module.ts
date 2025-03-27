@@ -6,6 +6,7 @@ import { ScraperRozetkaService } from './scraper-rozetka.service';
 import { ScraperCatalogService } from './scarper-telemart-catalog.service';
 import { ScraperServiceFactory } from './ScraperServiceFactory';
 import { ProductModule } from '../products/products.module';
+import { ScraperGateway } from '../ws.getway';
 import { S3Service } from '../s3/s3.service';
 
 @Module({
@@ -17,6 +18,8 @@ import { S3Service } from '../s3/s3.service';
     ScraperCatalogService,
     ScraperServiceFactory,
     S3Service,
+    ScraperGateway,
   ],
+  exports: [ScraperServiceFactory],
 })
 export class ScraperModule {}
