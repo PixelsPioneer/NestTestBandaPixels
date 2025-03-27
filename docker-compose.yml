@@ -56,7 +56,6 @@ services:
       networks:
         - elastic
 
-
   frontend:
       build:
         context: ./frontend
@@ -64,8 +63,8 @@ services:
         - "3000:3000"
       volumes:
         - ./frontend:/app
-      depends_on:
-        - backend
+#      depends_on:
+#        - backend
       networks:
         - elastic
 
