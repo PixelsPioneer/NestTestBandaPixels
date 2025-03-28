@@ -16,15 +16,6 @@ import { AuthModal } from './modalWindow/AuthModal';
 import { ProductsComponent } from './product/Products.component';
 import { ProductPage } from './productPages/productPage.component';
 import { SignOut } from './signOut/SignOut.component';
-import { WebSocketScraper } from './websocket/WebSocketComponent';
-
-function WebSocketContainer() {
-  return (
-    <>
-      <WebSocketScraper />
-    </>
-  );
-}
 
 function AppContent() {
   const { theme, toggleTheme } = useTheme();
@@ -63,7 +54,6 @@ function App() {
     <TokenProvider>
       <CartProvider>
         <Router>
-          <WebSocketContainer />
           <AppContent />
         </Router>
       </CartProvider>
