@@ -11,7 +11,7 @@ import { AuthModule } from './authentication/auth.module';
 import { CartModule } from './cart/cart.module';
 import { ElasticSearchModule } from './elasticsearch/elasticsearch.module';
 import { S3Service } from './s3/s3.service';
-import { ScraperGateway } from './ws.getway';
+import { ScraperGateway } from './ws.gateway';
 
 @Module({
   imports: [
