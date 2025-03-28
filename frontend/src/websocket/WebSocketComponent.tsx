@@ -2,13 +2,16 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:5000', {
+import { backendUrl } from '../constants/constants';
+
+const socket = io(backendUrl, {
   transports: ['websocket'],
 });
 
 export function WebSocketScraper() {
   const [messages, setMessages] = useState<string[]>([]);
   const [isScraping, setIsScraping] = useState(false);
+  const [service, setService] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScrapingStatus = (data: { message: string }) => {
@@ -30,25 +33,15 @@ export function WebSocketScraper() {
   }, []);
 
   const startScraping = useCallback(
-    (serviceType: string) => {
+    (selectedService: string) => {
       if (!isScraping) {
+        setService(selectedService);
         setMessages([]);
-        socket.emit('startScraping', serviceType);
+        socket.emit('startScraping', selectedService);
       }
     },
     [isScraping],
   );
 
-  return (
-    <div>
-      <button onClick={() => startScraping('telemart')} disabled={isScraping}>
-        {isScraping ? 'Scraping...' : 'Start scraping'}
-      </button>
-      <ul>
-        {messages.map((msg, index) => (
-          <li key={index}>{msg}</li>
-        ))}
-      </ul>
-    </div>
-  );
+  return { messages, isScraping, service, startScraping };
 }
