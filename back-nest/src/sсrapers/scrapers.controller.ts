@@ -1,14 +1,14 @@
-import { Controller, Param, Get, HttpCode } from '@nestjs/common';
+import { Controller, Param, Post, HttpCode } from '@nestjs/common';
 
-import { ScraperGateway } from '../ws.getway';
+import { ScraperGateway } from '../ws.gateway';
 
 @Controller('scraper')
 export class ScraperController {
   constructor(private readonly scraperGateway: ScraperGateway) {}
 
   @HttpCode(204)
-  @Get(':serviceType')
+  @Post(':serviceType')
   async scrape(@Param('serviceType') serviceType: string): Promise<void> {
-    this.scraperGateway.handleScraping(serviceType);
+    return this.scraperGateway.handleScraping(serviceType);
   }
 }
