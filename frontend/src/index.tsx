@@ -11,12 +11,12 @@ import reportWebVitals from './reportWebVitals';
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <ToastContainer />
-      <App />
-    </QueryClientProvider>
-  </React.StrictMode>,
+  // <React.StrictMode>
+  <QueryClientProvider client={queryClient}>
+    <ToastContainer />
+    <App />
+  </QueryClientProvider>,
+  // </React.StrictMode>
 );
 
 reportWebVitals(console.log);

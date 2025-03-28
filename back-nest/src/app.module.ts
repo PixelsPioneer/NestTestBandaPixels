@@ -11,6 +11,7 @@ import { AuthModule } from './authentication/auth.module';
 import { CartModule } from './cart/cart.module';
 import { ElasticSearchModule } from './elasticsearch/elasticsearch.module';
 import { S3Service } from './s3/s3.service';
+import { ScraperGateway } from './ws.gateway';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { S3Service } from './s3/s3.service';
       pinoHttp: {
         level: 'info',
         formatters: {
-          log(object) {
+          log(object: Record<string, unknown>) {
             return {
               ...object,
               context: object.context || 'Application',
@@ -51,6 +52,6 @@ import { S3Service } from './s3/s3.service';
     CartModule,
     ElasticSearchModule,
   ],
-  providers: [S3Service],
+  providers: [S3Service, ScraperGateway],
 })
 export class AppModule {}

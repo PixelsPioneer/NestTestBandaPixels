@@ -6,6 +6,7 @@ import { useTokenContext } from '../context/TokenContext';
 import { useCartContext } from '../context/cartContext';
 import CartIconWithDropdown from '../icons/cartIcon';
 import { AuthModal } from '../modalWindow/AuthModal';
+import { WebSocketScraper } from '../websocket/WebSocketComponent';
 import styles from './header.module.css';
 
 interface HeaderProps {
@@ -18,10 +19,11 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ toggleTheme, theme }) => {
   const { accessToken } = useTokenContext();
   const navigate = useNavigate();
-  const { cartCount } = useCartContext(); // 🔹 Отримуємо кількість товарів у кошику
+  const { cartCount } = useCartContext();
   const [currentTheme, setCurrentTheme] = useState<Themes>(theme);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSignIn, setIsSignIn] = useState(true);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     setCurrentTheme(theme);
@@ -32,9 +34,26 @@ export const Header: React.FC<HeaderProps> = ({ toggleTheme, theme }) => {
     setIsAuthModalOpen(true);
   };
 
+  const { messages, isScraping, service, startScraping } = WebSocketScraper();
+
   return (
     <header className={styles.header}>
-      <div className={styles.logo}>Scraper</div>
+      <div
+        className={styles.logoContainer}
+        onMouseEnter={() => setIsDropdownOpen(true)}
+        onMouseLeave={() => setIsDropdownOpen(false)}>
+        <h2 className={styles.logoButton}>Scraper</h2>
+        {isDropdownOpen && (
+          <div className={styles.dropdown}>
+            <button onClick={() => startScraping('telemart')} disabled={isScraping}>
+              {isScraping && service === 'telemart' ? 'Scraping...' : 'Telemart'}
+            </button>
+            <button onClick={() => startScraping('rozetka')} disabled={isScraping}>
+              {isScraping && service === 'rozetka' ? 'Scraping...' : 'Rozetka'}
+            </button>
+          </div>
+        )}
+      </div>
 
       <div className={styles.cartContainer}>
         <CartIconWithDropdown />
@@ -56,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleTheme, theme }) => {
       </nav>
 
       <div className={styles['theme-toggle-container']} onClick={toggleTheme}>
-        <div className={`${styles['theme-toggle']} ${currentTheme === Themes.DARK ? styles.dark : styles.light}`}>
+        <div className={`${styles['theme-toggle']} ${theme === Themes.DARK ? styles.dark : styles.light}`}>
           <span className={styles.label}>{Themes.LIGHT}</span>
           <span className={styles.label}>{Themes.DARK}</span>
           <div className={styles.slider}></div>

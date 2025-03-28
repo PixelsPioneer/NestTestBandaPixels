@@ -20,6 +20,9 @@ export const apiEndpoints = {
     search: `${backendUrl}/product-search/search`,
     searchBar: `${backendUrl}/product-search/search-bar`,
   },
+  scraper: {
+    telemart: `${backendUrl}/scraper/telemart`,
+  },
 };
 
 export enum Themes {
