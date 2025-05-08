@@ -17,6 +17,19 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.4
         with:
           ssh-private-key: ${{ secrets.autodeploy_scraper_swatdimonbil }}
+          
+      - name: Create back-nest .env file
+        run: |
+          echo "${{ secrets.PRODUCTION_BACKNEST_ENV_FILE }}" > back-nest/.env
+
+      - name: Create frontend .env file
+        run: |
+          echo "${{ secrets.PRODUCTION_FRONTEND_ENV_FILE }}" > frontend/.env
+
+      - name: Set permissions
+        run: |
+          chmod 600 back-nest/.env
+          chmod 600 frontend/.env
 
       - name: Run deploy script
         run: |
