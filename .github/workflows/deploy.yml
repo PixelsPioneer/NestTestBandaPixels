@@ -16,7 +16,7 @@ jobs:
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.4
         with:
-          ssh-private-key: ${{ secrets.autodeploy_scraper_swatdimonbil }}
+          ssh-private-key: ${{ secrets.AUTODEPLOY_SCRAPER_SWATDIMONBIL }}
           
       - name: Create back-nest .env file
         run: |
