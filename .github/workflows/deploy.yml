@@ -33,4 +33,4 @@ jobs:
 
       - name: Run deploy script
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@3.74.165.43 'cd ./NestTestBandaPixels && git pull && docker compose up -d'
+          ssh -o StrictHostKeyChecking=no ubuntu@3.74.165.43 'cd ./NestTestBandaPixels && git pull && sudo docker compose up -d'
