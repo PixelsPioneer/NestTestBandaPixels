@@ -1,6 +1,6 @@
 import { Controller, Param, Post, HttpCode } from '@nestjs/common';
 
-import { ScraperGateway } from '../ws.gateway';
+import { ScraperGateway } from '../ws/ws.gateway';
 
 @Controller('scraper')
 export class ScraperController {
