@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { io } from 'socket.io-client';
 
 import { apiEndpoints } from '../constants/constants';
+import { backendUrl } from '../constants/constants';
 import { useTokenContext } from '../context/TokenContext';
 import { Element } from '../interfaces/Element.component';
 import { toastError, toastSuccess } from '../notification/ToastNotification.component';
@@ -23,6 +25,7 @@ export const ProductsComponent: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [hasNextPage, setHasNextPage] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
 
   const { accessToken } = useTokenContext();
   const navigate = useNavigate();
@@ -76,6 +79,41 @@ export const ProductsComponent: React.FC = () => {
   const indexOfLastItem = currentPage * PRODUCTS_PER_PAGE;
   const indexOfFirstItem = indexOfLastItem - PRODUCTS_PER_PAGE;
   const currentElements = elements;
+
+  useEffect(() => {
+    const socket = io(backendUrl, { transports: ['websocket'] });
+
+    socket.on('connect', () => {
+      console.info('Socket connected');
+    });
+
+    socket.on('updateProductsMetadata', updatedProducts => {
+      if (!Array.isArray(updatedProducts)) {
+        console.warn('Waiting Array, Get:', updatedProducts);
+        updatedProducts = updatedProducts ? [updatedProducts] : [];
+      }
+
+      setProducts(updatedProducts);
+
+      setElements(prevElements => {
+        const updatedIds = new Set(updatedProducts.map((p: any) => p.id));
+
+        const mergedElements = [...prevElements.filter(el => !updatedIds.has(el.id)), ...updatedProducts];
+
+        return mergedElements;
+      });
+    });
+
+    socket.on('scrapingStatus', status => {
+      console.info('Scraping status:', status);
+    });
+
+    return () => {
+      socket.off('updateProductsMetadata');
+      socket.off('scrapingStatus');
+      socket.disconnect();
+    };
+  }, []);
 
   if (!accessToken) return <p>Please log in to see the products.</p>;
 

@@ -77,7 +77,7 @@ const CartIconWithDropdown = () => {
       try {
         const response = await axiosInstance.post(apiEndpoints.carts.update, payload);
         if (response.status === 200) {
-          console.log('SQL Cart table updated:', response.data);
+          console.info('SQL Cart table updated:', response.data);
         } else {
           console.error('Bad Request');
         }

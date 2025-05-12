@@ -6,7 +6,9 @@ import { useTokenContext } from '../context/TokenContext';
 import { useCartContext } from '../context/cartContext';
 import CartIconWithDropdown from '../icons/cartIcon';
 import { AuthModal } from '../modalWindow/AuthModal';
+import { WebSocketScraper } from '../websocket/WebSocketComponent';
 import styles from './header.module.css';
+import { ScrapingDropdown } from './headerComponents/ScrapingDropdown';
 
 interface HeaderProps {
   toggleTheme: () => void;
@@ -18,10 +20,11 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ toggleTheme, theme }) => {
   const { accessToken } = useTokenContext();
   const navigate = useNavigate();
-  const { cartCount } = useCartContext(); // 🔹 Отримуємо кількість товарів у кошику
+  const { cartCount } = useCartContext();
   const [currentTheme, setCurrentTheme] = useState<Themes>(theme);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSignIn, setIsSignIn] = useState(true);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     setCurrentTheme(theme);
@@ -32,10 +35,11 @@ export const Header: React.FC<HeaderProps> = ({ toggleTheme, theme }) => {
     setIsAuthModalOpen(true);
   };
 
+  const { messages, isScraping, service, startScraping } = WebSocketScraper();
+
   return (
     <header className={styles.header}>
-      <div className={styles.logo}>Scraper</div>
-
+      <ScrapingDropdown />
       <div className={styles.cartContainer}>
         <CartIconWithDropdown />
       </div>
@@ -56,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleTheme, theme }) => {
       </nav>
 
       <div className={styles['theme-toggle-container']} onClick={toggleTheme}>
-        <div className={`${styles['theme-toggle']} ${currentTheme === Themes.DARK ? styles.dark : styles.light}`}>
+        <div className={`${styles['theme-toggle']} ${theme === Themes.DARK ? styles.dark : styles.light}`}>
           <span className={styles.label}>{Themes.LIGHT}</span>
           <span className={styles.label}>{Themes.DARK}</span>
           <div className={styles.slider}></div>

@@ -16,7 +16,8 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       <ToastContainer />
       <App />
     </QueryClientProvider>
+    ,
   </React.StrictMode>,
 );
 
-reportWebVitals(console.log);
+reportWebVitals(console.info);
