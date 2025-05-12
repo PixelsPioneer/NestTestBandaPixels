@@ -6,12 +6,14 @@ import {
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
 import { Server } from 'socket.io';
+import Redis from 'ioredis';
+import Redlock, { ExecutionError } from 'redlock';
 
 import {
   ScraperServiceFactory,
   ServiceType,
-} from '../src/sсrapers/ScraperServiceFactory';
-import { PrismaService } from '../prisma/prisma.service';
+} from '../sсrapers/ScraperServiceFactory';
+import { PrismaService } from '../../prisma/prisma.service';
 
 enum SourceType {
   telemart = 'TELEMART',
@@ -22,29 +24,36 @@ enum SourceType {
 export class ScraperGateway {
   @WebSocketServer() server: Server;
   private readonly logger = new Logger(ScraperGateway.name);
-  private isScraping = false;
+  private readonly redisClient: Redis;
+  private readonly redlock: Redlock;
 
   constructor(
     private readonly scraperServiceFactory: ScraperServiceFactory,
     private readonly prisma: PrismaService,
-  ) {}
+  ) {
+    const redis = new Redis({
+      host: 'redis',
+      port: 6379,
+    });
+    this.redisClient = redis;
+    this.redlock = new Redlock([this.redisClient], {
+      driftFactor: 0.01,
+      retryCount: 5,
+      retryDelay: 200,
+      retryJitter: 100,
+    });
+  }
 
   @SubscribeMessage('startScraping')
   async handleScraping(@MessageBody() serviceType: string) {
-    if (this.isScraping) {
-      this.logger.warn(`Scraper is already running.`);
-      // this.server.emit('scrapingStatus', {
-      //   message: `Another scraper is already running`,
-      // });
-      return;
-    }
-
-    this.isScraping = true;
-    // this.server.emit('scrapingStatus', {
-    //   message: `Scraping ${serviceType} was started`,
-    // });
+    const lockKey = `scraper-lock:${serviceType}`;
+    let lock;
 
     try {
+      this.logger.log(`Attempting to acquire lock for ${serviceType}`);
+      lock = await this.redlock.acquire([lockKey], 180000); // 3m TTL
+      this.logger.log(`Lock acquired for ${serviceType}`);
+
       const scraperService = this.scraperServiceFactory.createService(
         serviceType as ServiceType,
       );
@@ -58,7 +67,6 @@ export class ScraperGateway {
       await scraperService.scrapeAndSave();
 
       const sourceType = SourceType[serviceType as keyof typeof SourceType];
-
       const sourceString = sourceType.toString();
 
       const updatedProducts = await this.prisma.product.findMany({
@@ -66,19 +74,27 @@ export class ScraperGateway {
       });
 
       this.logger.log(`Send metadata:`, updatedProducts);
-
       this.server.emit('updateProductsMetadata', updatedProducts);
-
-      // this.server.emit('scrapingStatus', {
-      //   message: `Scraping ${serviceType} was finished`,
-      // });
     } catch (error) {
-      this.logger.error(`Error during scraping ${serviceType}:`, error);
-      // this.server.emit('scrapingStatus', {
-      //   message: `Error scraping ${serviceType}`,
-      // });
+      if (error instanceof ExecutionError) {
+        this.logger.warn(
+          `Could not acquire lock for ${serviceType}: Retry window exceeded.`,
+        );
+      } else {
+        this.logger.error(`Error during scraping ${serviceType}:`, error);
+      }
     } finally {
-      this.isScraping = false;
+      if (lock) {
+        try {
+          await lock.release();
+          this.logger.log(`Lock released for ${serviceType}`);
+        } catch (releaseError) {
+          this.logger.error(
+            `Failed to release lock for ${serviceType}:`,
+            releaseError,
+          );
+        }
+      }
     }
   }
 }
