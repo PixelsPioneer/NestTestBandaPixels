@@ -8,6 +8,7 @@ import CartIconWithDropdown from '../icons/cartIcon';
 import { AuthModal } from '../modalWindow/AuthModal';
 import { WebSocketScraper } from '../websocket/WebSocketComponent';
 import styles from './header.module.css';
+import { ScrapingDropdown } from './headerComponents/ScrapingDropdown';
 
 interface HeaderProps {
   toggleTheme: () => void;
@@ -38,23 +39,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleTheme, theme }) => {
 
   return (
     <header className={styles.header}>
-      <div
-        className={styles.logoContainer}
-        onMouseEnter={() => setIsDropdownOpen(true)}
-        onMouseLeave={() => setIsDropdownOpen(false)}>
-        <h2 className={styles.logoButton}>Scraper</h2>
-        {isDropdownOpen && (
-          <div className={styles.dropdown}>
-            <button onClick={() => startScraping('telemart')} disabled={isScraping}>
-              {isScraping && service === 'telemart' ? 'Scraping...' : 'Telemart'}
-            </button>
-            <button onClick={() => startScraping('rozetka')} disabled={isScraping}>
-              {isScraping && service === 'rozetka' ? 'Scraping...' : 'Rozetka'}
-            </button>
-          </div>
-        )}
-      </div>
-
+      <ScrapingDropdown />
       <div className={styles.cartContainer}>
         <CartIconWithDropdown />
       </div>
