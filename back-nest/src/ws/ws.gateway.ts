@@ -51,7 +51,7 @@ export class ScraperGateway {
 
     try {
       this.logger.log(`Attempting to acquire lock for ${serviceType}`);
-      lock = await this.redlock.acquire([lockKey], 180000); // 3m TTL
+      lock = await this.redlock.acquire([lockKey], 180000);
       this.logger.log(`Lock acquired for ${serviceType}`);
 
       const scraperService = this.scraperServiceFactory.createService(
