@@ -63,8 +63,8 @@ services:
         - "3000:3000"
       volumes:
         - ./frontend:/app
-#      depends_on:
-#        - backend
+      depends_on:
+        - backend
       networks:
         - elastic
 
@@ -90,19 +90,19 @@ services:
     networks:
       - elastic
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.6.0
-    container_name: kibana
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - ELASTICSEARCH_USERNAME=kibana_system
-      - ELASTICSEARCH_PASSWORD=rootpassword
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-    networks:
-      - elastic
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:8.6.0
+#    container_name: kibana
+#    environment:
+#      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+#      - ELASTICSEARCH_USERNAME=kibana_system
+#      - ELASTICSEARCH_PASSWORD=rootpassword
+#    ports:
+#      - "5601:5601"
+#    depends_on:
+#      - elasticsearch
+#    networks:
+#      - elastic
 
 volumes:
   esdata:
