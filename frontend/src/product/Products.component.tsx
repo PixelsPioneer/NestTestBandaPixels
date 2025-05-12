@@ -6,6 +6,7 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 
 import { apiEndpoints } from '../constants/constants';
+import { backendUrl } from '../constants/constants';
 import { useTokenContext } from '../context/TokenContext';
 import { Element } from '../interfaces/Element.component';
 import { toastError, toastSuccess } from '../notification/ToastNotification.component';
@@ -80,10 +81,10 @@ export const ProductsComponent: React.FC = () => {
   const currentElements = elements;
 
   useEffect(() => {
-    const socket = io('http://localhost:5000', { transports: ['websocket'] });
+    const socket = io(backendUrl, { transports: ['websocket'] });
 
     socket.on('connect', () => {
-      console.log('Socket connected');
+      console.info('Socket connected');
     });
 
     socket.on('updateProductsMetadata', updatedProducts => {
@@ -91,8 +92,6 @@ export const ProductsComponent: React.FC = () => {
         console.warn('Waiting Array, Get:', updatedProducts);
         updatedProducts = updatedProducts ? [updatedProducts] : [];
       }
-
-      console.log('Get Metadata:', updatedProducts);
 
       setProducts(updatedProducts);
 
@@ -106,7 +105,7 @@ export const ProductsComponent: React.FC = () => {
     });
 
     socket.on('scrapingStatus', status => {
-      console.log('Scraping status:', status);
+      console.info('Scraping status:', status);
     });
 
     return () => {
