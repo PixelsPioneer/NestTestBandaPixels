@@ -1,25 +1,48 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
-import Redis from 'ioredis';
+import Redis, { Redis as RedisClientType } from 'ioredis';
 
 import { Cart } from '../cart/model/cart.model';
 import { CacheKeys } from './cache-keys.constant';
 
+interface CustomRedisCommands extends RedisClientType {
+  customEval(): Promise<string>;
+}
+
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(RedisService.name);
-  private redisClient: Redis;
+  private redisClient: CustomRedisCommands;
 
   async onModuleInit() {
     this.redisClient = new Redis({
-      host: process.env.REDIS_HOST,
+      host: process.env.REDIS_HOST ?? '127.0.0.1',
       port: parseInt(process.env.REDIS_PORT ?? '6379', 10),
+    }) as CustomRedisCommands;
+
+    this.redisClient.defineCommand('customEval', {
+      numberOfKeys: 0,
+      lua: "return 'OK'",
     });
 
-    this.redisClient.on('connect', () => this.logger.log('Connected to Redis'));
+    this.redisClient.on('connect', async () => {
+      this.logger.log('Connected to Redis');
+
+      try {
+        const result = await this.redisClient.customEval();
+        this.logger.log('Custom Eval Result:', result);
+      } catch (err) {
+        this.logger.error('Custom Eval Error:', err);
+      }
+    });
+
     this.redisClient.on('error', (err) =>
       this.logger.error('Redis error:', err),
     );
+  }
+
+  async onModuleDestroy() {
+    await this.redisClient.quit();
   }
 
   async set<T>(
@@ -71,10 +94,6 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     const key = `${CacheKeys.CARTS}:${userId}`;
     await this.redisClient.del(key);
     this.logger.log(`Cart for user ${userId} has been cleared`);
-  }
-
-  async onModuleDestroy() {
-    await this.redisClient.quit();
   }
 
   async saveProductImages(productFolder: string, images: string[]) {
